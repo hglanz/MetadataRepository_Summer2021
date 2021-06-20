@@ -51,7 +51,7 @@ The objective of this summer research is to develop, expand, and polish a reposi
   
   *  UCI Machine Learning Repository
   
-  *  Kaggle
+  *  Kaggle ([https://www.kaggle.com/kaggle/meta-kaggle](https://www.kaggle.com/kaggle/meta-kaggle))
   
   *  CORGIs Data Repository
   
