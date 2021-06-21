@@ -7,4 +7,3 @@
 scrape_rvest <- function(url) {
   h <- rvest::read_html(url)
 }
-#
