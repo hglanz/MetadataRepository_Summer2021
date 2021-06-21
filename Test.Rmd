@@ -8,9 +8,14 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(rvest)
 ```
 
 ```{r}
-
+test_vest <- read_html("https://datahub.io/higorspinto/car-sales-world-annual")
+description <- test_vest %>% html_nodes(".readable-width") %>% html_text()
+description %>%
+  pluck(2) %>%
+  str_remove_all("\n")
 ```
 
