@@ -47,15 +47,17 @@ The objective of this summer research is to develop, expand, and polish a reposi
 
   *  Harvard's Dataverse
   
-  *  Data Dryad
+  *  Data Dryad ([https://cran.r-project.org/web/packages/rdryad/rdryad.pdf](https://cran.r-project.org/web/packages/rdryad/rdryad.pdf))([https://datadryad.org/api/v2/docs/](https://datadryad.org/api/v2/docs/))
   
   *  UCI Machine Learning Repository
   
-  *  Kaggle
+  *  Kaggle ([https://www.kaggle.com/kaggle/meta-kaggle](https://www.kaggle.com/kaggle/meta-kaggle))
   
   *  CORGIs Data Repository
   
-  *  Other data repositories...?
+  *  data.world
+  *  data-is-plural.com
+  *  datahub.io
   
   
    **4.  Organize metadata into single dataset**
