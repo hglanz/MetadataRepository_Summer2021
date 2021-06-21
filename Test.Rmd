@@ -20,6 +20,6 @@ description %>%
 ```
 
 ```{r}
-library(bestpredictor)
+
 ```
 
