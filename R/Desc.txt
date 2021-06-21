@@ -1,0 +1,1 @@
+This folder contains the scraping code (using rvest) along with all .R files.
