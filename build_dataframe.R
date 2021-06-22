@@ -1,4 +1,4 @@
-#' @author Sucheen Sundaram
+#' Builds the Dataframe
 #' @import rvest
 #' @import dplyr
 #' @import stringr
@@ -6,6 +6,8 @@
 #' @param url, url to be scraped
 #' @param css_selectors, vector of css_selectors to scrape
 #' @return dataframe with scraped data organized into columns by their CSS selector tag. May require postprocessing.
+#'
+#' @export build_dataframe
 
 build_dataframe <- function(url, css_selectors) {
   scraped <- data.frame(css_selectors)
