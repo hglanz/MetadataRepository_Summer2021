@@ -11,6 +11,7 @@
 
 build_dataframe <- function(url, css_selectors) {
   scraped <- data.frame(css_selectors)
+  names(scraped) <- css_selectors
   for(i in names(scraped)) {
     scraped$i <- scrape_rvest(url, css_selectors[i])
   }

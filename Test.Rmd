@@ -20,6 +20,30 @@ description %>%
 ```
 
 ```{r}
-scrape_rvest("https://www.google.com/search?q=google&oq=google&aqs=chrome..69i57j69i65j69i60l3.1264j0j7&sourceid=chrome&ie=UTF-8", "span")
+read_html("https://www.kaggle.com/kaggle/meta-kaggle") %>%
+  html_nodes(".bpBCZF") %>%
+  html_text()
+
+url <- "https://datahub.io/higorspinto/car-sales-world-annual"
+  text <- url %>%
+    read_html() %>%
+    html_nodes(".no-left-padding th:nth-child(6) , .no-left-padding th:nth-child(5) , .no-left-padding th:nth-child(4) , .no-left-padding th:nth-child(3) , .no-left-padding th:nth-child(2) , .no-left-padding th:nth-child(1)") %>%
+    html_text()
+df <- data.frame(matrix(ncol = length(text), nrow = 0))
+colnames(df) <- text
+
+data <- url %>%
+    read_html() %>%
+    html_nodes(".format-list~ .col-xs-2+ .col-xs-2 , .format-list , .no-left-padding .col-xs-1")  %>%
+    html_text()
+data <- data %>%
+  str_remove_all("\n")
+data[1:4]
+count = 1
+  for(i in names(df)) {
+    df$i <- c(data[count])
+    count <- count+1
+  }
 ```
+
 
