@@ -64,7 +64,8 @@ The objective of this summer research is to develop, expand, and polish a reposi
   
   *  Establish full set of variables/columns/features in metadata.
   
-  *  Establish best form for metadata dataset. 
+  *  Establish best form for metadata dataset.
+  *  Metadata Target Fields/Observed Fields: https://docs.google.com/spreadsheets/d/1CidGQw74Y1an9Z5JuayYCFkQor5zSMwDZR952OuQE2g/edit?usp=sharing
   
   
   **5. Understand/Learn about data storage, curation, and indexing.**
