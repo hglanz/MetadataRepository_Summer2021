@@ -71,6 +71,6 @@ The objective of this summer research is to develop, expand, and polish a reposi
   **5. Understand/Learn about data storage, curation, and indexing.**
   
   
-**Activity Log
+  **Activity Log
 
   *  https://docs.google.com/document/d/1SzroBCSzDsLGObtMDmymxTMAX_J-zrTDHAbVTWgzHCg/edit?usp=sharing
