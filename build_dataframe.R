@@ -7,7 +7,7 @@
 #' @param css_selectors, vector of css_selectors to scrape
 #' @return dataframe with scraped data organized into columns by their CSS selector tag. May require postprocessing.
 #'
-#' @export build_dataframe
+#' @export
 
 build_dataframe <- function(url, css_selectors) {
   scraped <- data.frame(css_selectors)
