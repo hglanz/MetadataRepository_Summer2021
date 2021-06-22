@@ -9,9 +9,11 @@
 #' @export scrape_rvest
 
 scrape_rvest <- function(url, type) {
-  html_fm <- rvest::read_html(url)
+  html_fm <- rvest::read_html(url) # Reads html script from given URL
+  # After reading html script, extract the text by obtaining the html notes with the given html specifier (param type)
   extraction <- html_fm %>% rvest::html_nodes(type) %>% html_text() %>%
     str_remove_all("\n") %>%
+    # Clean up the string with scraped data
     str_trim()
-  return(descriptions)
+  return(extraction)
 }

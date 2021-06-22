@@ -20,6 +20,6 @@ description %>%
 ```
 
 ```{r}
-
+scrape_rvest("https://www.google.com/search?q=google&oq=google&aqs=chrome..69i57j69i65j69i60l3.1264j0j7&sourceid=chrome&ie=UTF-8", "span")
 ```
 
