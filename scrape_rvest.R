@@ -10,7 +10,7 @@
 
 scrape_rvest <- function(url, type) {
   html_fm <- rvest::read_html(url)
-  descriptions <- html_fm %>% rvest::html_nodes(type) %>% html_text() %>%
+  extraction <- html_fm %>% rvest::html_nodes(type) %>% html_text() %>%
     str_remove_all("\n") %>%
     str_trim()
   return(descriptions)
