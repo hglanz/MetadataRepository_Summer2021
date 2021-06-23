@@ -23,5 +23,6 @@ scrape_datahub <- function(url) {
     rowid_to_column() %>%
     filter(rowid > 1)
   data <- data[,2:length(names(data))]
+  write.csv(data, "./Data/scrape_datahub.csv")
   return(data)
 }

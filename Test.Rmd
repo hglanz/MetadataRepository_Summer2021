@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(rvest)
+library(Frost2021Package)
 ```
 
 ```{r}
@@ -24,7 +25,7 @@ read_html("https://www.kaggle.com/kaggle/meta-kaggle") %>%
   html_nodes(".bpBCZF") %>%
   html_text()
 
-url <- "https://datahub.io/higorspinto/car-sales-world-annual"
+url <- "https://datahub.io/core/natural-gas"
   text <- url %>%
     read_html() %>%
     html_nodes(".no-left-padding th:nth-child(6) , .no-left-padding th:nth-child(5) , .no-left-padding th:nth-child(4) , .no-left-padding th:nth-child(3) , .no-left-padding th:nth-child(2) , .no-left-padding th:nth-child(1)") %>%
@@ -39,10 +40,20 @@ data <- url %>%
 data <- data %>%
   str_remove_all("\n")
 data[1:4]
-rbind(df, text) %>%
+data <- rbind(df, text) %>%
   rbind(data) %>%
   rowid_to_column() %>%
   filter(rowid > 1)
+
+url %>%
+  read_html() %>%
+  html_nodes("h1") %>%
+  html_text()
+
+data <- data[,2:length(names(data))]
 ```
 
+```{r}
+scrape_datahub(url)
+```
 
