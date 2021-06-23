@@ -32,7 +32,7 @@ scrape_dryad <- function(url) {
   file_info$sizeMB <- numbers
   df$eight <- file_info %>%
     nest(data = everything())
-  pieces <- map_int(names(dataframe), ~str_split(dataframe[.x], " ") %>% pluck(1) %>% length())
-  dataframe[pieces != 2]
+  pieces <- map_int(names(df), ~str_split(df[.x], " ") %>% pluck(1) %>% length())
+  df <- df[pieces != 2]
   return(df)
 }
