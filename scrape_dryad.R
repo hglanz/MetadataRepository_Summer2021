@@ -18,10 +18,21 @@ scrape_dryad <- function(url) {
   df <- df[!(names(df) %in% c("one", "two", "three"))]
   file_info_columns <- scrape_rvest(url, "#sidebar a")
   file_info_data <- scrape_rvest(url, ".c-file-group__list div")
-  file_info <- data.frame(filename = file_info_columns, size = parse_number(file_info_data))
+  file_info <- data.frame(filename = file_info_columns, sizeMB = file_info_data)
+  numbers <- parse_number(file_info$sizeMB)
+  count <- 1
+  for(i in file_info$sizeMB) {
+    if("k" %in% i) { # if reported in kilobytes
+      numbers[count] <- numbers[count]/1000
+    }else if(!("MB" %in% i)) { # if reported in bytes
+      numbers[count] <- numbers[count]/1000000
+    }
+    count <- count+1
+  }
+  file_info$sizeMB <- numbers
   df$eight <- file_info %>%
     nest(data = everything())
-  names(df) <- cols[2:8]
-  names(df) <- c("Citation", "Abstract", "Funding", "Location", "Data", "Date", "Authors")
+  pieces <- map_int(names(dataframe), ~str_split(dataframe[.x], " ") %>% pluck(1) %>% length())
+  dataframe[pieces != 2]
   return(df)
 }
