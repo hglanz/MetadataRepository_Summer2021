@@ -39,11 +39,10 @@ data <- url %>%
 data <- data %>%
   str_remove_all("\n")
 data[1:4]
-count = 1
-  for(i in names(df)) {
-    df$i <- c(data[count])
-    count <- count+1
-  }
+rbind(df, text) %>%
+  rbind(data) %>%
+  rowid_to_column() %>%
+  filter(rowid > 1)
 ```
 
 

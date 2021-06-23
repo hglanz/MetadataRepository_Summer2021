@@ -16,11 +16,8 @@ scrape_datahub <- function(url) {
     html_text()
   data <- data %>%
     str_remove_all("\n")
-  data <- data[1:4]
-  count = 1
-  for(i in names(df)) {
-    df$i <- data[count]
-    count <- count+1
-  }
-  return(df)
+  rbind(df, columns) %>%
+    rbind(data) %>%
+    rowid_to_column() %>%
+    filter(rowid > 1)
 }
