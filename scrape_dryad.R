@@ -34,5 +34,8 @@ scrape_dryad <- function(url) {
     nest(data = everything())
   pieces <- map_int(names(df), ~str_split(df[.x], " ") %>% pluck(1) %>% length())
   df <- df[pieces != 2]
+  names(df) <- c("Citation", "Abstract", "Methods", "File Information", "Upload Date", "Authors")
+  authors <- str_split(df$Citation, " [(]") %>% pluck(1)
+  df <- mutate(df, Authors = authors[1])
   return(df)
 }
