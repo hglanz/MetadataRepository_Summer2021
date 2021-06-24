@@ -11,6 +11,9 @@
 scrape_rvest <- function(url, type) {
   html_fm <- rvest::read_html(url) # Reads html script from given URL
   # After reading html script, extract the text by obtaining the html notes with the given html specifier (param type)
+  if("\\" %in% type) {
+    type <- gsub("\\", "\\\\", type)
+  }
   extraction <- html_fm %>% rvest::html_nodes(type) %>% html_text() %>%
     str_remove_all("\n") %>%
     # Clean up the string with scraped data
