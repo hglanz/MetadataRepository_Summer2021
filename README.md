@@ -56,7 +56,7 @@ The objective of this summer research is to develop, expand, and polish a reposi
   *  CORGIs Data Repository
   
   *  data.world
-  *  data-is-plural.com
+  *  https://www.cdc.gov/datastatistics/index.html
   *  datahub.io
   *  California Open Data Portal: https://data.ca.gov/group
   
