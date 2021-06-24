@@ -25,19 +25,28 @@ scrape_harvard <- function(url) {
   file_info$Name <- file_info$file_info_names
   file_info <- file_info[, names(file_info) != "file_info_names"]
   downloads <- scrape_rvest(url, ".visible-lg-inline")
-  variables <- scrape_rvest(url, "#datasetForm\\:tabView\\:filesTable\\:0\\:fileNumVars")
-  observations <- scrape_rvest(url, "#datasetForm\\:tabView\\:filesTable\\:0\\:fileNumObs")
+  variables <- scrape_rvest(url, ".unf-block span:nth-child(1)")
+  observations <- scrape_rvest(url, ".unf-block span:nth-child(2)")
   if(!identical(downloads, character(0))) {
+    while(length(downloads) != nrow(file_info)) {
+      downloads <- append(downloads, 0)
+    }
     file_info$Downloads <- parse_number(downloads)
   }else{
     file_info$Downloads <- NA
   }
   if(!identical(variables, character(0))) {
+    while(length(variables) != nrow(file_info)) {
+      variables <- append(variables, 0)
+    }
     file_info$Variables <- parse_number(variables)
   }else{
     file_info$Variables <- NA
   }
   if(!identical(observations, character(0))) {
+    while(length(observations) != nrow(file_info)) {
+      observations <- append(observations, 0)
+    }
     file_info$Observations <- parse_number(observations)
   }else{
     file_info$Observations <- NA
