@@ -13,8 +13,6 @@ scrape_cdph <- function(url) {
   df <- data.frame(matrix(ncol = length(cols), nrow = 0))
   df <- rbind(df, data)
   names(df) <- cols
-  cols
-  data
   social <- scrape_rvest(url, ".nav-item a")
   df$Social <- paste(social, collapse = ", ")
   return(df)
