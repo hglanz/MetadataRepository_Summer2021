@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(rvest)
 library(Frost2021Package)
+library(XML)
 ```
 
 ```{r}
@@ -21,36 +22,8 @@ description %>%
 ```
 
 ```{r}
-read_html("https://www.kaggle.com/kaggle/meta-kaggle") %>%
-  html_nodes(".bpBCZF") %>%
-  html_text()
-
-url <- "https://datahub.io/core/natural-gas"
-  text <- url %>%
-    read_html() %>%
-    html_nodes(".no-left-padding th:nth-child(6) , .no-left-padding th:nth-child(5) , .no-left-padding th:nth-child(4) , .no-left-padding th:nth-child(3) , .no-left-padding th:nth-child(2) , .no-left-padding th:nth-child(1)") %>%
-    html_text()
-df <- data.frame(matrix(ncol = length(text), nrow = 0))
-colnames(df) <- text
-
-data <- url %>%
-    read_html() %>%
-    html_nodes(".format-list~ .col-xs-2+ .col-xs-2 , .format-list , .no-left-padding .col-xs-1")  %>%
-    html_text()
-data <- data %>%
-  str_remove_all("\n")
-data[1:4]
-data <- rbind(df, text) %>%
-  rbind(data) %>%
-  rowid_to_column() %>%
-  filter(rowid > 1)
-
-url %>%
-  read_html() %>%
-  html_nodes("h1") %>%
-  html_text()
-
-data <- data[,2:length(names(data))]
+url <- "https://www.kaggle.com/kaggle/meta-kaggle"
+scrape_rvest(url, ".dataset-header-v2__title")
 ```
 
 ```{r}
@@ -154,19 +127,59 @@ url <- "https://data.cdc.gov/Vaccinations/COVID-19-Vaccine-Distribution-Allocati
 cols <- scrape_rvest(url, ".entry-description div")
 df <- data.frame(matrix(ncol = length(cols), nrow = 0))
 data <- scrape_rvest(url, ".dd")
-url %>%
-  read_html(url) %>%
-  rvest::html_nodes(xpath = "//*[contains(concat( \" \", @class, \" \" ), concat( \" \", \"title\", \" \" ))]") %>%
-  html_text()
 ```
 
 ```{r}
 url <- "https://data.ca.gov/dataset/california-state-fleet"
-cols <- scrape_rvest(url, "dt , .module-heading , tr:nth-child(9) .dataset-label , tr:nth-child(10) .dataset-label , tr:nth-child(2) .dataset-label , tr:nth-child(1) .dataset-label , tr:nth-child(3) .dataset-label , tr:nth-child(5) .dataset-label , thead th:nth-child(1) , .tags h3")
-data <- scrape_rvest(url, ".automatic-local-datetime , .license span , .nav-item a , .module-shallow .heading , dd , tr:nth-child(5) .dataset-details , tr:nth-child(1) .dataset-details , .main-responsive-panel h1 , th+ th , .well")
-df <- data.frame(matrix(ncol = length(cols), nrow = 0))
+desired_cols <- scrape_rvest(url, ".tags h3 , .module-heading , dt , .dataset-label")
+cols <- scrape_rvest(url, ".module-heading , dt , .dataset-label , .tags h3")
+data <- scrape_rvest(url, ".license span , .nav-item a , .module-shallow .heading , dd , .dataset-details , .well")
+df <- data.frame(matrix(ncol = length(desired_cols), nrow = 0))
 df <- rbind(df, data)
-names(df) <- cols
-df
+
+#df <- data.frame(matrix(ncol = length(cols), nrow = 0))
+#df <- rbind(df, data)
+#names(df) <- cols
+#social <- scrape_rvest(url, ".nav-item a")
+#df$Social <- paste(social, collapse = ", ")
+#df <- df %>%
+#  select(Tags:Social)
+#test <- scrape_cdph("https://data.ca.gov/dataset/covid-19-staff-data")
+
+# iterate
+
+full_df <- data.frame(matrix(ncol = ncol(test), nrow = 1))
+names(full_df) <- names(test)
+for(i in 1:119) {
+  url <- paste("https://data.ca.gov/dataset?q=data&page=", i, sep = "")
+  pg <- read_html(url)
+  links <- html_attr(html_nodes(pg, "a"), "href")
+  links <- data.frame(links) %>%
+    filter(str_detect(links, "/dataset/")) %>%
+    distinct()
+  basic <- "https://data.ca/gov"
+  for(j in links$links) {
+    data_link <- paste(basic, j)
+    full_df <- rbind(full_df, scrape_cdph(data_link))
+  }
+}
+full_df
+```
+
+```{r}
+full_df <- data.frame(matrix(ncol = ncol(test), nrow = 0))
+names(full_df) <- names(test)
+url <- "https://data.ca.gov/dataset?q=data&page=1"
+pg <- read_html(url)
+links <- html_attr(html_nodes(pg, "a"), "href")
+links <- data.frame(links) %>%
+  filter(str_detect(links, "/dataset/")) %>%
+  distinct()
+for(i in links$links) {
+  basic_link <- "https://data.ca.gov"
+  data_link <- paste(basic_link, i, sep = "")
+  full_df <- rbind(full_df, scrape_cdph(data_link))
+}
+full_df
 ```
 
