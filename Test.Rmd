@@ -144,13 +144,13 @@ df <- rbind(df, data)
 #df$Social <- paste(social, collapse = ", ")
 #df <- df %>%
 #  select(Tags:Social)
-#test <- scrape_cdph("https://data.ca.gov/dataset/covid-19-staff-data")
+test <- scrape_cdph("https://data.ca.gov/dataset/covid-19-staff-data")
 
 # iterate
 
 full_df <- data.frame(matrix(ncol = ncol(test), nrow = 1))
 names(full_df) <- names(test)
-for(i in 1:119) {
+for(i in 1:141) {
   url <- paste("https://data.ca.gov/dataset?q=data&page=", i, sep = "")
   pg <- read_html(url)
   links <- html_attr(html_nodes(pg, "a"), "href")
@@ -175,6 +175,7 @@ links <- html_attr(html_nodes(pg, "a"), "href")
 links <- data.frame(links) %>%
   filter(str_detect(links, "/dataset/")) %>%
   distinct()
+l <- vector(mode = "list", length = nrow(links))
 for(i in links$links) {
   basic_link <- "https://data.ca.gov"
   data_link <- paste(basic_link, i, sep = "")
@@ -183,3 +184,22 @@ for(i in links$links) {
 full_df
 ```
 
+```{r}
+full_df <- data.frame(matrix(ncol = ncol(test), nrow = 0))
+for(i in 1:141) {
+  url <- paste("https://data.ca.gov/dataset?q=data&page=", i, sep = "")
+pg <- read_html(url)
+links <- html_attr(html_nodes(pg, "a"), "href")
+links <- data.frame(links) %>%
+  filter(str_detect(links, "/dataset/") & !identical(links, character(0))) %>%
+  distinct()
+#print(links$links)
+for(j in links$links) {
+  basic_link <- "https://data.ca.gov"
+  data_link <- paste(basic_link, j, sep = "")
+  print(data_link)
+  full_df <- rbind(full_df, scrape_cdph(data_link))
+}
+full_df
+}
+```
