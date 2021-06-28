@@ -136,34 +136,7 @@ cols <- scrape_rvest(url, ".module-heading , dt , .dataset-label , .tags h3")
 data <- scrape_rvest(url, ".license span , .nav-item a , .module-shallow .heading , dd , .dataset-details , .well")
 df <- data.frame(matrix(ncol = length(desired_cols), nrow = 0))
 df <- rbind(df, data)
-
-#df <- data.frame(matrix(ncol = length(cols), nrow = 0))
-#df <- rbind(df, data)
-#names(df) <- cols
-#social <- scrape_rvest(url, ".nav-item a")
-#df$Social <- paste(social, collapse = ", ")
-#df <- df %>%
-#  select(Tags:Social)
 test <- scrape_cdph("https://data.ca.gov/dataset/covid-19-staff-data")
-
-# iterate
-
-full_df <- data.frame(matrix(ncol = ncol(test), nrow = 1))
-names(full_df) <- names(test)
-for(i in 1:141) {
-  url <- paste("https://data.ca.gov/dataset?q=data&page=", i, sep = "")
-  pg <- read_html(url)
-  links <- html_attr(html_nodes(pg, "a"), "href")
-  links <- data.frame(links) %>%
-    filter(str_detect(links, "/dataset/")) %>%
-    distinct()
-  basic <- "https://data.ca/gov"
-  for(j in links$links) {
-    data_link <- paste(basic, j)
-    full_df <- rbind(full_df, scrape_cdph(data_link))
-  }
-}
-full_df
 ```
 
 ```{r}
@@ -186,19 +159,40 @@ full_df
 
 ```{r}
 full_df <- data.frame(matrix(ncol = ncol(test), nrow = 0))
-for(i in 1:141) {
+for(i in 1:119) {
   url <- paste("https://data.ca.gov/dataset?q=data&page=", i, sep = "")
-pg <- read_html(url)
-links <- paste("https://data.ca.gov", html_attr(html_nodes(read_html(url), ".dataset-heading a"), "href"), sep = "") %>% data.frame() %>% distinct()
-for(j in links$.) {
-  data_link <- j
-  tryCatch(expr = {
-    full_df <- rbind(full_df, scrape_cdph(data_link))
-  }, error = function(err) {
-    NULL
-  })
-  print(nrow(full_df))
+  pg <- read_html(url)
+  links <- paste("https://data.ca.gov", html_attr(html_nodes(read_html(url), ".dataset-heading a"), "href"), sep = "") %>% data.frame() %>% distinct()
+  for(j in links$.) {
+    data_link <- j
+    tryCatch(expr = {
+      full_df <- rbind(full_df, scrape_cdph(data_link))
+    }, error = function(err) {
+      NULL
+    })
+    print(nrow(full_df))
+  }
 }
-}
-full_df
+clean_tag <- str_split(full_df$Tags, "[ ]+") %>%
+  paste(sep = ";") %>%
+  data.frame()
+clean_tag <- str_remove_all(clean_tag$., c("c[{]", "[)]", "[\"]")) %>%
+  data.frame()
+```
+```{r}
+url <- "https://catalog.data.gov/dataset/2006-2012-math-test-results-district-all-students"
+cols <- c(Frost2021Package::scrape_rvest(url, ".module-heading , .table-toggle-less tr+ tr .dataset-label , #access-use h3"), scrape_rvest(url, ".dataset-label"))
+data <- c(scrape_rvest(url, ".module-narrow a"), scrape_rvest(url, ".table-toggle-less a , .dataset-details , td > span , #sec-dates td"))
+data
+cols <- cols %>% data.frame() %>% distinct()
+cols <- cols$.
+data <- data %>% data.frame() %>% rowid_to_column() %>% filter(rowid > 2)
+data <- data$.
+df <- data.frame(matrix(ncol = length(cols), nrow = 0))
+df <- rbind(df, data)
+names(df) <- cols
+df
+scrape_rvest(url, ".well")
+
+scrape_datagov(url)
 ```
