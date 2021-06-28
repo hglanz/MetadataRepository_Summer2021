@@ -50,15 +50,13 @@ The objective of this summer research is to develop, expand, and polish a reposi
   *  Data Dryad ([https://cran.r-project.org/web/packages/rdryad/rdryad.pdf](https://cran.r-project.org/web/packages/rdryad/rdryad.pdf))([https://datadryad.org/api/v2/docs/](https://datadryad.org/api/v2/docs/))
   
   *  UCI Machine Learning Repository
-  
   *  Kaggle ([https://www.kaggle.com/kaggle/meta-kaggle](https://www.kaggle.com/kaggle/meta-kaggle))
-  
   *  CORGIs Data Repository
-  
   *  data.world
   *  https://www.cdc.gov/datastatistics/index.html
   *  datahub.io
   *  California Open Data Portal: https://data.ca.gov/group
+  *  data.gov ([https://www.data.gov/](https://www.data.gov/))
   
   
    **4.  Organize metadata into single dataset**
