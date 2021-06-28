@@ -189,17 +189,16 @@ full_df <- data.frame(matrix(ncol = ncol(test), nrow = 0))
 for(i in 1:141) {
   url <- paste("https://data.ca.gov/dataset?q=data&page=", i, sep = "")
 pg <- read_html(url)
-links <- html_attr(html_nodes(pg, "a"), "href")
-links <- data.frame(links) %>%
-  filter(str_detect(links, "/dataset/") & !identical(links, character(0))) %>%
-  distinct()
-#print(links$links)
-for(j in links$links) {
-  basic_link <- "https://data.ca.gov"
-  data_link <- paste(basic_link, j, sep = "")
-  print(data_link)
-  full_df <- rbind(full_df, scrape_cdph(data_link))
+links <- paste("https://data.ca.gov", html_attr(html_nodes(read_html(url), ".dataset-heading a"), "href"), sep = "") %>% data.frame() %>% distinct()
+for(j in links$.) {
+  data_link <- j
+  tryCatch(expr = {
+    full_df <- rbind(full_df, scrape_cdph(data_link))
+  }, error = function(err) {
+    NULL
+  })
+  print(nrow(full_df))
+}
 }
 full_df
-}
 ```
