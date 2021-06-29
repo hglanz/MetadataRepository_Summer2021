@@ -11,6 +11,8 @@ library(tidyverse)
 library(rvest)
 library(Frost2021Package)
 library(XML)
+library(purrr)
+library(bestpredictor)
 ```
 
 ```{r}
@@ -194,5 +196,31 @@ names(df) <- cols
 df
 scrape_rvest(url, ".well")
 
-scrape_datagov(url)
+scrape_datagov("https://catalog.data.gov/dataset/2006-2011-nys-math-test-results-by-grade-citywide-by-race-ethnicity")
 ```
+
+```{r}
+# Iterate data.gov
+full_df <- data.frame(matrix(ncol = 24, nrow = 0))
+for(i in 1:15391) {
+  url <- paste("https://catalog.data.gov/dataset?page=", i, sep = "")
+  pg <- read_html(url)
+  links <- html_attr(html_nodes(pg, ".dataset-heading a"), "href")
+  links <- paste("https://catalog.data.gov", links, sep = "")
+  links <- links %>% data.frame() %>% distinct()
+  links <- links$.
+  for(j in links) {
+    tryCatch(expr = {
+      full_df <- rbind(full_df, scrape_datagov(j))
+    }, error = function(err) {
+      NULL
+    })
+    print(nrow(full_df))
+  }
+  print(nrow(full_df))
+}
+full_df
+
+??Frost2021Package::scrape_harvard
+```
+
