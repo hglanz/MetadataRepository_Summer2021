@@ -234,15 +234,18 @@ for(i in 1:15391) {
   links <- links %>% data.frame() %>% distinct()
   links <- links$.
   for(j in links) {
-    #tryCatch(expr = {
-    #  full_df <- rbind(full_df, scrape_datagov(j))
-    #}, error = function(err) {
-    #  NULL
-    #})
-    full_df
+    scraped <- scrape_datagov(j)
+    print(j)
+    for(k in names(scraped)) {
+      if(!(k %in% names(full_df))) {
+        scraped[k] <- c(NA)
+      }
+    }
+    full_df <- rbind(full_df, scraped)
   }
+  print(nrow(full_df))
 }
-full_df
-scrape_datagov("https://catalog.data.gov/dataset/low-altitude-aerial-imagery-obtained-with-unmanned-aerial-systems-uas-flights-over-black-beach")
+
+full_df <- read.csv("./Data/cdph_scraped.csv")
 ```
 
