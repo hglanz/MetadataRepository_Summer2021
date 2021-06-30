@@ -29,15 +29,12 @@ scrape_rvest(url, ".dataset-header-v2__title")
 ```
 
 ```{r}
-url <- "https://datadryad.org/stash/dataset/doi:10.6078/D1M08W"
+url <- "https://datadryad.org/stash/dataset/doi:10.7272/Q6W37T8B"
 cols <- scrape_rvest(url, ".c-sidebox__heading , .o-heading__level2 , .o-heading__level1")
-data <- scrape_rvest(url, ".c-locations__data , .o-heading__level2+ p , .t-landing__text-wall p , .o-metadata__author , #show_license p , .o-metrics__metric , .c-file-group , .c-file-group__summary")
+data <- scrape_rvest(url, ".c-locations__data , .o-heading__level2+ p , .t-landing__text-wall p , #show_license p , .o-metrics__metric , .c-file-group , .c-file-group__summary")
 df <- data.frame(matrix(ncol = length(cols), nrow = 0))
 df <- rbind(df, data)
 names(df) <- c("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
-df <- df %>%
-  mutate(Authors = paste(one, two, three, sep = "; "))
-df <- df[!(names(df) %in% c("one", "two", "three"))]
 file_info_columns <- scrape_rvest(url, "#sidebar a")
 file_info_data <- scrape_rvest(url, ".c-file-group__list div")
 file_info <- data.frame(filename = file_info_columns, sizeMB = file_info_data)
@@ -56,6 +53,8 @@ df$eight <- file_info %>%
   nest(data = everything())
 names(df) <- cols[2:8]
 names(df) <- c("Citation", "Abstract", "Funding", "Location", "Data", "Date", "Authors")
+df$Authors <- paste(scrape_rvest(url, ".o-metadata__author"), collapse = "; ")
+df
 ```
 
 ```{r}
@@ -247,5 +246,19 @@ for(i in 1:15391) {
 }
 
 full_df <- read.csv("./Data/cdph_scraped.csv")
+```
+
+```{r}
+url <- "https://datahub.io/search"
+pg <- read_html(url)
+links <- html_attr(html_nodes(pg, "a"), "href")
+links <- data.frame(links) %>% filter(str_detect(links, "/core/")) %>% distinct()
+full_df <- data.frame(matrix(ncol = 7, nrow = 0))
+for(i in links$links) {
+  full_df <- rbind(full_df, scrape_datahub(paste("https://datahub.io", i, sep = "")))
+}
+full_df[, names(full_df) != "rowid"]
+full_df$X.Size. <- parse_number(full_df$X.Size.)
+print("Git Commit It")
 ```
 
