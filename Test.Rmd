@@ -74,18 +74,17 @@ authors[1]
 
 ```{r}
 # Iterate dryad
-l <- list()
 url <- "https://datadryad.org/search?q="
 pg <- read_html(url)
 links <- html_attr(html_nodes(pg, "#documents a"), "href")
 links <- paste("https://datadryad.org", links, sep = "")
 links <- data.frame(links) %>% distinct()
 links <- links$links
+df <- data.frame(matrix(ncol = 5, nrow = 0))
 for(i in 1:length(links)) {
-  print(links[i])
-  l[[i]] <- names(scrape_dryad(links[i]))
+  df <- rbind(df, scrape_dryad(links[i]))
 }
-Reduce(intersect, l)
+df
 ```
 
 
