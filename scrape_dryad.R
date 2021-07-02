@@ -54,7 +54,11 @@ scrape_dryad <- function(url) {
     date <- date[2]
   }
   if(!identical(date, character(0))) {
-    df$Date <- date
+    if(length(date) == 1) {
+      df$Date <- date
+    }else{
+      df$Date <- date[1]
+    }
   }else{
     df$Date <- c(NA)
   }
