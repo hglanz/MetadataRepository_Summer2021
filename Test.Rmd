@@ -29,16 +29,20 @@ scrape_rvest(url, ".dataset-header-v2__title")
 ```
 
 ```{r}
-url <- "https://datadryad.org/stash/dataset/doi:10.7272/Q6W37T8B"
-cols <- scrape_rvest(url, ".c-sidebox__heading , .o-heading__level2 , .o-heading__level1")
+url <- "https://datadryad.org/stash/dataset/doi:10.5061/dryad.tqjq2bvxm"
+cols <- scrape_rvest(url, ".c-sidebox__heading , .o-heading__level2")
 data <- scrape_rvest(url, ".c-locations__data , .o-heading__level2+ p , .t-landing__text-wall p , #show_license p , .o-metrics__metric , .c-file-group , .c-file-group__summary")
 df <- data.frame(matrix(ncol = length(cols), nrow = 0))
 df <- rbind(df, data)
-names(df) <- c("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
 file_info_columns <- scrape_rvest(url, "#sidebar a")
 file_info_data <- scrape_rvest(url, ".c-file-group__list div")
-file_info <- data.frame(filename = file_info_columns, sizeMB = file_info_data)
-numbers <- parse_number(file_info$sizeMB)
+if(!identical(file_info_data, character(0))) {
+  file_info <- data.frame(filename = file_info_columns, sizeMB = file_info_data)
+}else{
+  file_info <- c(NA)
+}
+if(!is.na(file_info)) {
+  numbers <- parse_number(file_info$sizeMB)
 count <- 1
 for(i in file_info$sizeMB) {
   if("k" %in% i) { # if reported in kilobytes
@@ -49,16 +53,17 @@ for(i in file_info$sizeMB) {
   count <- count+1
 }
 file_info$sizeMB <- numbers
-df$eight <- file_info %>%
-  nest(data = everything())
-names(df) <- cols[2:8]
-names(df) <- c("Citation", "Abstract", "Funding", "Location", "Data", "Date", "Authors")
+file_info <- nest(file_info)
+}
+names(df) <- cols[1:length(data)]
+df$`Data Files` <- file_info
+df$Methods <- scrape_rvest(url, ".t-landing__text-wall:nth-child(8) p:nth-child(1)")
 df$Authors <- paste(scrape_rvest(url, ".o-metadata__author"), collapse = "; ")
 df
 ```
 
 ```{r}
-dataframe <- scrape_dryad("https://datadryad.org/stash/dataset/doi:10.6078/D14Q14")
+dataframe <- scrape_dryad("https://datadryad.org/stash/dataset/doi:10.5061/dryad.tqjq2bvxm")
 pieces <- map_int(names(dataframe), ~str_split(dataframe[.x], " ") %>% pluck(1) %>% length())
 dataframe[pieces != 2]
 authors <- dataframe$Citation %>%
@@ -66,6 +71,23 @@ authors <- dataframe$Citation %>%
   pluck(1)
 authors[1]
 ```
+
+```{r}
+# Iterate dryad
+l <- list()
+url <- "https://datadryad.org/search?q="
+pg <- read_html(url)
+links <- html_attr(html_nodes(pg, "#documents a"), "href")
+links <- paste("https://datadryad.org", links, sep = "")
+links <- data.frame(links) %>% distinct()
+links <- links$links
+for(i in 1:length(links)) {
+  print(links[i])
+  l[[i]] <- names(scrape_dryad(links[i]))
+}
+Reduce(intersect, l)
+```
+
 
 ```{r}
 url <- "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/GPRRND"
@@ -215,7 +237,6 @@ access <- access$access
 access <- str_remove_all(access, ":")
 access <- paste(access, collapse = ", ")
 df$`Access & Use Information` <- access
-df
 
 scrape_datagov("https://catalog.data.gov/dataset/2006-2011-nys-math-test-results-by-grade-citywide-by-race-ethnicity")
 harvard <- scrape_harvard("https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/VUAIMQ")
@@ -259,6 +280,10 @@ for(i in links$links) {
 }
 full_df[, names(full_df) != "rowid"]
 full_df$X.Size. <- parse_number(full_df$X.Size.)
-print("Git Commit It")
+scrape_datahub("https://datahub.io/core/finance-vix")
+```
+
+```{r}
+
 ```
 
