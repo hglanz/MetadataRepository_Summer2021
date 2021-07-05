@@ -74,15 +74,20 @@ authors[1]
 
 ```{r}
 # Iterate dryad
-url <- "https://datadryad.org/search?q="
-pg <- read_html(url)
-links <- html_attr(html_nodes(pg, "#documents a"), "href")
-links <- paste("https://datadryad.org", links, sep = "")
-links <- data.frame(links) %>% distinct()
-links <- links$links
 df <- data.frame(matrix(ncol = 5, nrow = 0))
-for(i in 1:length(links)) {
-  df <- rbind(df, scrape_dryad(links[i]))
+count <- 0
+for(i in 1:4169) {
+  url <- paste("https://datadryad.org/search?page=", i, "&q=", sep = "")
+  pg <- read_html(url)
+  links <- html_attr(html_nodes(pg, "#documents a"), "href")
+  links <- paste("https://datadryad.org", links, sep = "")
+  links <- data.frame(links) %>% distinct()
+  links <- links$links
+  for(i in 1:length(links)) {
+    df <- rbind(df, scrape_dryad(links[i]))
+    print(nrow(df))
+  }
+  cat("\014")
 }
 df
 ```
@@ -91,8 +96,9 @@ df
 ```{r}
 url <- "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/GPRRND"
 name <- scrape_rvest(url, "#title")
-  cols <- scrape_rvest(url, "th , #metrics-heading")
+  cols <- scrape_rvest(url, "#metrics-heading , th")
   data <- scrape_rvest(url, ".metrics-count-block , td")
+  data <- data[data != "" & !str_detect(data, "dataDictionary")]
   df <- data.frame(matrix(ncol = length(cols), nrow = 0))
   df <- rbind(df, data)
   df$Citation <- scrape_rvest(url, ".citation-select")
@@ -112,7 +118,7 @@ name <- scrape_rvest(url, "#title")
   observations <- scrape_rvest(url, ".unf-block span:nth-child(2)")
   if(!identical(downloads, character(0))) {
     while(length(downloads) != nrow(file_info)) {
-      downloads <- append(downloads, 0)
+      downloads <- append(downloads, NA)
     }
     file_info$Downloads <- parse_number(downloads)
   }else{
@@ -120,7 +126,7 @@ name <- scrape_rvest(url, "#title")
   }
   if(!identical(variables, character(0))) {
     while(length(variables) != nrow(file_info)) {
-      variables <- append(variables, 0)
+      variables <- append(variables, NA)
     }
     file_info$Variables <- parse_number(variables)
   }else{
@@ -128,7 +134,7 @@ name <- scrape_rvest(url, "#title")
   }
   if(!identical(observations, character(0))) {
     while(length(observations) != nrow(file_info)) {
-      observations <- append(observations, 0)
+      observations <- append(observations, NA)
     }
     file_info$Observations <- parse_number(observations)
   }else{
@@ -136,12 +142,27 @@ name <- scrape_rvest(url, "#title")
   }
   file_info <- nest(file_info, data = everything())
   df$`File Data` <- file_info
-  df
+  df$Author <- scrape_rvest(url, "#metadata_author td")
+  df$Name <- name
+  df[, c("Name", "Description", "Subject", "Keyword", "File Data", "Deposit Date", "Author", "Depositor", "Dataset")]
+```
 
-sh <- scrape_harvard(url)
-scrape_rvest(url, ".unf-block span:nth-child(1)")
-sh$`File Data` %>% unnest()
-df$`File Data` %>% unnest()
+```{r}
+full_df <- data.frame(matrix(ncol = 9, nrow = 0))
+for(i in 1:11395) {
+  url <- paste("https://dataverse.harvard.edu/dataverse/harvard?q=&sort=dateSort&order=desc&page=", i, "&types=datasets", sep = "")
+  pg <- read_html(url)
+  links <- html_attr(html_nodes(pg, ".card-title-icon-block span a"), "href")
+  links <- paste("https://dataverse.harvard.edu", links, sep = "")
+  links <- data.frame(links) %>% distinct()
+  links <- links$links
+  for(j in links) {
+    print(j)
+    full_df <- rbind(full_df, scrape_harvard(j))
+  }
+}
+
+html_attr(html_nodes(read_html("https://dataverse.harvard.edu/dataverse/harvard"), "a .card-title-icon-block"), "href")
 ```
 
 ```{r}
@@ -283,6 +304,42 @@ scrape_datahub("https://datahub.io/core/finance-vix")
 ```
 
 ```{r}
+# Zenodo
+url <- "https://zenodo.org/record/5068660#.YOH7xhNKgTU"
+name <- scrape_rvest(url, "h1")
+author <- scrape_rvest(url, "h1 + p")
+cols <- c(c("Name", "Authors"), scrape_rvest(url, ".addthis_32x32_style+ h4 , dt:nth-child(14) , dt:nth-child(12) , dt:nth-child(5) , dt:nth-child(1) , #collapse-stats tr:nth-child(6) td:nth-child(1) , #collapse-stats tr:nth-child(5) td:nth-child(1)"))
+data <- scrape_rvest(url, "dd:nth-child(15) a , dd:nth-child(13) li , dd:nth-child(2) , #collapse-stats tr:nth-child(6) td:nth-child(2) , #collapse-stats tr:nth-child(5) td:nth-child(2) , h1+ p , h1 , #invenio-csl .ng-binding")
+df <- data.frame(matrix(ncol = length(cols), nrow = 0))
+df <- rbind(df, data)
+keyword <- scrape_rvest(url, "dd:nth-child(6)")
+if(!identical(keyword, character(0))) {
+  keyword <- paste(keyword, collapse = ", ")
+  df$`Keyword(s):` <- keyword
+}else{
+  df$`Keyword(s):` <- c(NA)
+}
+communities <- scrape_rvest(url, "dd:nth-child(13) li")
+if(!identical(communities, character(0))) {
+  communities <- paste(communities, collapse = ", ")
+  df$`Communities:` <- communities
+}else{
+  df$`Communities:` <- c(NA)
+}
+file_info <- data.frame(Name = scrape_rvest(url, ".filename"), SizeMB = scrape_rvest(url, ".nowrap:nth-child(2)"))
+numbers <- parse_number(file_info$SizeMB)
+count <- 1
+for(i in file_info$SizeMB) {
+  if("kB" %in% i) {
+    numbers[count] <- numbers[count]/1000
+  }else if("GB" %in% i) {
+    numbers[count] <- numbers[count]*1000
+  }
+}
+file_info$SizeMB <- numbers
+file_info <- file_info %>% nest(data = everything())
+df$`File Info` <- file_info
+names(df) <- cols
 
+scrape_zenodo("https://zenodo.org/record/5045610#.YOJ1zRNKgTU")
 ```
-
