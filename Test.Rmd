@@ -13,6 +13,7 @@ library(Frost2021Package)
 library(XML)
 library(purrr)
 library(bestpredictor)
+library(lubridate)
 ```
 
 ```{r}
@@ -305,7 +306,7 @@ scrape_datahub("https://datahub.io/core/finance-vix")
 
 ```{r}
 # Zenodo
-url <- "https://zenodo.org/record/5045610#.YOJ1zRNKgTU"
+url <- "https://zenodo.org/record/5045610#.YOZWXRNKgTV"
 name <- scrape_rvest(url, "h1")
 author <- scrape_rvest(url, "h1 + p")
 cols <- c(c("Name", "Authors"), scrape_rvest(url, ".addthis_32x32_style+ h4 , dt:nth-child(14) , dt:nth-child(12) , dt:nth-child(5) , dt:nth-child(1) , #collapse-stats tr:nth-child(6) td:nth-child(1) , #collapse-stats tr:nth-child(5) td:nth-child(1)"))
@@ -350,9 +351,32 @@ citation <- scrape_rvest(url, ".ng-binding")
 if(!identical(citation, character(0))) {
   df$`Cite as` <- scrape_rvest(url, ".ng-binding")
 }else{
-  df$`Cite as` <- c(NA)
+  citation <- scrape_rvest(url, "#invenio-csl p")
+  if(!identical(citation, character(0))) {
+    df$`Cite as` <- citation
+  }else{
+    df$`Cite as` <- c(NA)
+  }
 }
-df
+df <- mutate(df, FileInfo <- file_info)
+df[, c("Name", "Authors", "Unique views", "Unique downloads", "Publication date:", "Keyword(s):", "data", "Communities:")]
 
-#scrape_zenodo("https://zenodo.org/record/5045610#.YOJ1zRNKgTU")
+scrape_zenodo("https://zenodo.org/record/5081153#.YOZkbi1h23U")
 ```
+```{r}
+full_df <- data.frame(matrix(ncol = 8, nrow = 0))
+for(i in 1:1) {
+  url <- paste("https://zenodo.org/search?page=", i, "&size=20#", sep = "")
+  url <- "https://zenodo.org"
+  pg <- read_html(url)
+  links <- html_attr(html_nodes(pg, "h4 a"), "href")
+  links <- links[str_detect(links, "/record/")]
+  links <- paste("https://zenodo.org", links, sep = "")
+  for(j in links) {
+    full_df <- rbind(full_df, scrape_zenodo(j))
+    print(nrow(full_df))
+  }
+}
+write.csv(full_df, "./Data/zenodo_scraped.csv")
+```
+
