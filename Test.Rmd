@@ -305,7 +305,7 @@ scrape_datahub("https://datahub.io/core/finance-vix")
 
 ```{r}
 # Zenodo
-url <- "https://zenodo.org/record/5068660#.YOH7xhNKgTU"
+url <- "https://zenodo.org/record/5045610#.YOJ1zRNKgTU"
 name <- scrape_rvest(url, "h1")
 author <- scrape_rvest(url, "h1 + p")
 cols <- c(c("Name", "Authors"), scrape_rvest(url, ".addthis_32x32_style+ h4 , dt:nth-child(14) , dt:nth-child(12) , dt:nth-child(5) , dt:nth-child(1) , #collapse-stats tr:nth-child(6) td:nth-child(1) , #collapse-stats tr:nth-child(5) td:nth-child(1)"))
@@ -313,19 +313,7 @@ data <- scrape_rvest(url, "dd:nth-child(15) a , dd:nth-child(13) li , dd:nth-chi
 df <- data.frame(matrix(ncol = length(cols), nrow = 0))
 df <- rbind(df, data)
 keyword <- scrape_rvest(url, "dd:nth-child(6)")
-if(!identical(keyword, character(0))) {
-  keyword <- paste(keyword, collapse = ", ")
-  df$`Keyword(s):` <- keyword
-}else{
-  df$`Keyword(s):` <- c(NA)
-}
 communities <- scrape_rvest(url, "dd:nth-child(13) li")
-if(!identical(communities, character(0))) {
-  communities <- paste(communities, collapse = ", ")
-  df$`Communities:` <- communities
-}else{
-  df$`Communities:` <- c(NA)
-}
 file_info <- data.frame(Name = scrape_rvest(url, ".filename"), SizeMB = scrape_rvest(url, ".nowrap:nth-child(2)"))
 numbers <- parse_number(file_info$SizeMB)
 count <- 1
@@ -338,8 +326,33 @@ for(i in file_info$SizeMB) {
 }
 file_info$SizeMB <- numbers
 file_info <- file_info %>% nest(data = everything())
-df$`File Info` <- file_info
-names(df) <- cols
+df <- mutate(df, FileInfo = file_info)
+data <- append(data, file_info)
+cols <- append(cols, "File Info")
+names(df) <- cols[1:length(data)]
+if(!identical(keyword, character(0)) & !str_detect(keyword, "Supplement")) {
+  df$`Keyword(s):` <- keyword %>% str_trim()
+}else{
+  df$`Keyword(s):` <- c(NA)
+}
+if(!identical(communities, character(0))) {
+  df$`Communities:` <- paste(communities, collapse = ", ")
+}else{
+  df$`Communities:` <- c(NA)
+}
+license <- paste(scrape_rvest(url, "dd:nth-child(15) a"), collapse = ", ")
+if(!identical(license, character(0))) {
+  df$`License (for files):` <- license
+}else{
+  df$`License (for files):` <- c(NA)
+}
+citation <- scrape_rvest(url, ".ng-binding")
+if(!identical(citation, character(0))) {
+  df$`Cite as` <- scrape_rvest(url, ".ng-binding")
+}else{
+  df$`Cite as` <- c(NA)
+}
+df
 
-scrape_zenodo("https://zenodo.org/record/5045610#.YOJ1zRNKgTU")
+#scrape_zenodo("https://zenodo.org/record/5045610#.YOJ1zRNKgTU")
 ```
