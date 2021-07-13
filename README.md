@@ -58,6 +58,7 @@ The objective of this summer research is to develop, expand, and polish a reposi
   *  California Open Data Portal: https://data.ca.gov/group
   *  data.gov ([https://www.data.gov/](https://www.data.gov/))
   *  zenodo.org
+  *  BCO-DMO ([https://www.bco-dmo.org/search/dataset](https://www.bco-dmo.org/search/dataset))
   
   
    **4.  Organize metadata into single dataset**
@@ -69,6 +70,16 @@ The objective of this summer research is to develop, expand, and polish a reposi
   
   
   **5. Understand/Learn about data storage, curation, and indexing.**
+  
+  * What is Data Curation? ([https://www.dataversity.net/what-is-data-curation/](https://www.dataversity.net/what-is-data-curation/))
+  * Data Curation 101 ([https://www.dataversity.net/what-is-data-curation/](https://www.dataversity.net/what-is-data-curation/))
+  * Data Curation Network ([https://datacurationnetwork.org/](https://datacurationnetwork.org/))
+  * Wikipedia Data Curation ([https://en.wikipedia.org/wiki/Data_curation](https://en.wikipedia.org/wiki/Data_curation))
+  * What is Metadata? ([https://www.opendatasoft.com/blog/2016/08/25/what-is-metadata-and-why-is-it-important-data](https://www.opendatasoft.com/blog/2016/08/25/what-is-metadata-and-why-is-it-important-data))
+  * Digital Curation Centre ([https://www.dcc.ac.uk/guidance/standards/metadata/list](https://www.dcc.ac.uk/guidance/standards/metadata/list))
+  * University of Pittsburgh: Metadata Standards ([https://pitt.libguides.com/metadatadiscovery/metadata-standards](https://pitt.libguides.com/metadatadiscovery/metadata-standards))
+  * Research Data Alliance Metadata Standards ([https://rd-alliance.github.io/metadata-directory/standards/](https://rd-alliance.github.io/metadata-directory/standards/))
+  * Cornell Metadata Standards ([https://data.research.cornell.edu/content/writing-metadata](https://data.research.cornell.edu/content/writing-metadata))
   
   
    **Activity Log
