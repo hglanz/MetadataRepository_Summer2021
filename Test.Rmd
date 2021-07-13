@@ -88,7 +88,6 @@ for(i in 1:4169) {
     df <- rbind(df, scrape_dryad(links[i]))
     print(nrow(df))
   }
-  cat("\014")
 }
 df
 ```
@@ -362,10 +361,11 @@ df <- mutate(df, FileInfo <- file_info)
 df[, c("Name", "Authors", "Unique views", "Unique downloads", "Publication date:", "Keyword(s):", "data", "Communities:")]
 
 scrape_zenodo("https://zenodo.org/record/5081153#.YOZkbi1h23U")
+read.csv("./Data/dryad_scraped.csv")
 ```
 ```{r}
 full_df <- data.frame(matrix(ncol = 8, nrow = 0))
-for(i in 1:1) {
+for(i in 1:200) {
   url <- paste("https://zenodo.org/search?page=", i, "&size=20#", sep = "")
   url <- "https://zenodo.org"
   pg <- read_html(url)
@@ -377,6 +377,14 @@ for(i in 1:1) {
     print(nrow(full_df))
   }
 }
-write.csv(full_df, "./Data/zenodo_scraped.csv")
+cdph <- read.csv("./Data/cdph_scraped.csv")
+url <- "https://zenodo.org/search?page=1&size=20"
+pg <- read_html(url)
+links <- html_attr(html_nodes(pg, "h4 .ng-binding"), "href")
 ```
 
+```{r}
+# Merge things
+corgis <- read.csv(".Data/CORGIS_metadata.csv")
+datagov <- read.csv("./Data/datagov_scraped.csv")
+```
