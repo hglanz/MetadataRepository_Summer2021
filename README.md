@@ -81,6 +81,7 @@ The objective of this summer research is to develop, expand, and polish a reposi
   * University of Pittsburgh: Metadata Standards ([https://pitt.libguides.com/metadatadiscovery/metadata-standards](https://pitt.libguides.com/metadatadiscovery/metadata-standards))
   * Research Data Alliance Metadata Standards ([https://rd-alliance.github.io/metadata-directory/standards/](https://rd-alliance.github.io/metadata-directory/standards/))
   * Cornell Metadata Standards ([https://data.research.cornell.edu/content/writing-metadata](https://data.research.cornell.edu/content/writing-metadata))
+  * DataHub Application: https://engineering.linkedin.com/blog/2019/data-hub
   
   
    **Activity Log
