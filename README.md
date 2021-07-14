@@ -59,6 +59,7 @@ The objective of this summer research is to develop, expand, and polish a reposi
   *  data.gov ([https://www.data.gov/](https://www.data.gov/))
   *  zenodo.org
   *  BCO-DMO ([https://www.bco-dmo.org/search/dataset](https://www.bco-dmo.org/search/dataset))
+  *  LIST OF DATA REPOSITORIES ([http://oad.simmons.edu/oadwiki/Data_repositories](http://oad.simmons.edu/oadwiki/Data_repositories))
   
   
    **4.  Organize metadata into single dataset**
