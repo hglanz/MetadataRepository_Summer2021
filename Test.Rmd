@@ -134,24 +134,24 @@ scrape_dryad("https://datadryad.org/stash/dataset/doi:10.5061/dryad.mkkwh70xh")
 
 
 ```{r}
-url <- "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/GPRRND"
+url <- "https://dataverse.harvard.edu/dataverse/TrumpTweets2020;jsessionid=639f9c1b20298462c57f46db93ef"
 name <- scrape_rvest(url, "#title")
   cols <- scrape_rvest(url, "#metrics-heading , th")
   data <- scrape_rvest(url, ".metrics-count-block , td")
   data <- data[data != "" & !str_detect(data, "dataDictionary")]
   df <- data.frame(matrix(ncol = length(cols), nrow = 0))
   df <- rbind(df, data)
-  df$Citation <- scrape_rvest(url, ".citation-select")
-  names(df) <- cols
-  names(df)[6] <- "function"
-  names(df)[5] <- "File Data"
+  names(df) <- cols[1:ncol(df)]
   file_info_cols <- c("Name", "Downloads", "Variables", "Observations")
   file_info_names <- scrape_rvest(url, ".fileNameOriginal a")
   file_info_names <- file_info_names[file_info_names != ""]
-  file_info <- data.frame(matrix(ncol = length(file_info_cols), nrow = length(file_info_names)))
+  file_info <- data.frame(matrix(ncol = length(file_info_cols), nrow = length(file_info_names)+1))
   names(file_info) <- file_info_cols
-  file_info <- cbind(file_info, file_info_names)
-  file_info$Name <- file_info$file_info_names
+  #file_info <- cbind(file_info, file_info_names)
+  file_info$`FileName` <- checkNull(scrape_rvest(url, "#datasetForm\\:tabView\\:filesTable\\:0\\:fileInfoInclude-filesTable a"))
+  fn <- data.frame(file_info$FileName) %>% distinct()
+  fn <- fn$file_info.FileName
+  file_info$FileName <- fn
   file_info <- file_info[, names(file_info) != "file_info_names"]
   downloads <- scrape_rvest(url, ".visible-lg-inline")
   variables <- scrape_rvest(url, ".unf-block span:nth-child(1)")
@@ -180,19 +180,29 @@ name <- scrape_rvest(url, "#title")
   }else{
     file_info$Observations <- NA
   }
-  file_info <- nest(file_info, data = everything())
-  df$`File Data` <- file_info
-  df$Author <- scrape_rvest(url, "#metadata_author td")
-  df$Name <- name
-  df[, c("Name", "Description", "Subject", "Keyword", "File Data", "Deposit Date", "Author", "Depositor", "Dataset")]
+  for(i in names(file_info)) {
+    df[i] <- paste(c(file_info[i]), collapse = "; ")
+  }
+  df$Author <- checkNull(scrape_rvest(url, "#metadata_author td"))
+  df$Name <- checkNull(name)
+  df$`Deposit Date` <- checkNull(scrape_rvest(url, "#metadata_dateOfDeposit td"))
+  df$Citation <- checkNull(scrape_rvest(url, ".citation-select"))
+  
+  target <- c("Name", "Description", "Subject", "Keyword", "Deposit Date", "Author", "Depositor", "Citation", "FileName", "Downloads", "Variables", "Observations")
+  for(i in target) {
+    if(!(i %in% names(df))) {
+      df[i] <- c(NA)
+    }
+  }
+  df[target]
 ```
 
 ```{r}
-full_df <- data.frame(matrix(ncol = 9, nrow = 0))
+full_df <- data.frame(matrix(ncol = 12, nrow = 0))
 for(i in 1:11395) {
-  url <- paste("https://dataverse.harvard.edu/dataverse/harvard?q=&sort=dateSort&order=desc&page=", i, "&types=datasets", sep = "")
+  url <- paste("https://dataverse.harvard.edu/dataverse/harvard?q=&types=dataverses%3Adatasets&sort=dateSort&order=desc&page=", i, sep = "")
   pg <- read_html(url)
-  links <- html_attr(html_nodes(pg, ".card-title-icon-block span a"), "href")
+  links <- html_attr(html_nodes(pg, ".card-title-icon-block a"), "href")
   links <- paste("https://dataverse.harvard.edu", links, sep = "")
   links <- data.frame(links) %>% distinct()
   links <- links$links
@@ -201,16 +211,9 @@ for(i in 1:11395) {
     full_df <- rbind(full_df, scrape_harvard(j))
   }
 }
-
-html_attr(html_nodes(read_html("https://dataverse.harvard.edu/dataverse/harvard"), "a .card-title-icon-block"), "href")
+full_df
 ```
 
-```{r}
-url <- "https://data.cdc.gov/Vaccinations/COVID-19-Vaccine-Distribution-Allocations-by-Juris/w9zu-fywh"
-cols <- scrape_rvest(url, ".entry-description div")
-df <- data.frame(matrix(ncol = length(cols), nrow = 0))
-data <- scrape_rvest(url, ".dd")
-```
 
 ```{r}
 url <- "https://data.ca.gov/dataset/california-state-fleet"
