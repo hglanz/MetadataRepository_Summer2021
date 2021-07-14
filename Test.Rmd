@@ -30,37 +30,74 @@ scrape_rvest(url, ".dataset-header-v2__title")
 ```
 
 ```{r}
-url <- "https://datadryad.org/stash/dataset/doi:10.5061/dryad.tqjq2bvxm"
-cols <- scrape_rvest(url, ".c-sidebox__heading , .o-heading__level2")
-data <- scrape_rvest(url, ".c-locations__data , .o-heading__level2+ p , .t-landing__text-wall p , #show_license p , .o-metrics__metric , .c-file-group , .c-file-group__summary")
-df <- data.frame(matrix(ncol = length(cols), nrow = 0))
-df <- rbind(df, data)
-file_info_columns <- scrape_rvest(url, "#sidebar a")
-file_info_data <- scrape_rvest(url, ".c-file-group__list div")
-if(!identical(file_info_data, character(0))) {
-  file_info <- data.frame(filename = file_info_columns, sizeMB = file_info_data)
-}else{
-  file_info <- c(NA)
-}
-if(!is.na(file_info)) {
-  numbers <- parse_number(file_info$sizeMB)
-count <- 1
-for(i in file_info$sizeMB) {
-  if("k" %in% i) { # if reported in kilobytes
-    numbers[count] <- numbers[count]/1000
-  }else if(!("MB" %in% i)) { # if reported in bytes
-    numbers[count] <- numbers[count]/1000000
+url <- "https://datadryad.org/stash/dataset/doi:10.5061/dryad.mkkwh70xh"
+  cols <- scrape_rvest(url, ".c-sidebox__heading , .o-heading__level2")
+  data <- scrape_rvest(url, ".c-locations__data , .o-heading__level2+ p , .t-landing__text-wall p , #show_license p , .o-metrics__metric , .c-file-group , .c-file-group__summary")
+  df <- data.frame(matrix(ncol = length(cols), nrow = 0))
+  df <- rbind(df, data)
+  file_info_columns <- scrape_rvest(url, "#sidebar a")
+  file_info_data <- scrape_rvest(url, ".c-file-group__list div")
+  if(!identical(file_info_data, character(0))) {
+    file_info <- data.frame(filename = file_info_columns, sizeMB = file_info_data)
+  }else{
+    file_info <- c(NA)
   }
-  count <- count+1
+  if(!is.na(file_info)) {
+    numbers <- parse_number(file_info$sizeMB)
+    count <- 1
+    for(i in file_info$sizeMB) {
+      if("k" %in% i) { # if reported in kilobytes
+        numbers[count] <- numbers[count]/1000
+      }else if(!("MB" %in% i)) { # if reported in bytes
+        numbers[count] <- numbers[count]/1000000
+      }
+      count <- count+1
+    }
+    file_info$sizeMB <- numbers
+    file_info <- nest(file_info, data = everything())
+  }
+  names(df) <- cols[1:length(data)]
+  df$`Data Files` <- file_info
+  methods <- scrape_rvest(url, ".t-landing__text-wall:nth-child(8) p:nth-child(1)")
+  if(!identical(methods, character(0))) {
+    df$Methods <- paste(methods, collapse = ", ")
+  }else{
+    df$Methods <- c(NA)
+  }
+  authors <- paste(scrape_rvest(url, ".o-metadata__author"), collapse = "; ")
+  if(!identical(authors, character(0))) {
+    df$Authors <- authors
+  }else{
+    df$Authors <- c(NA)
+  }
+  date <- scrape_rvest(url, ".c-file-group__summary")
+  if(identical(date, character(0))) {
+    date <- scrape_rvest(url, ".o-metadata__group2-item:nth-child(1)")
+    date <- str_split(date, ": ") %>% pluck(1)
+    date <- date[2]
+  }
+  if(!identical(date, character(0))) {
+    if(length(date) == 1) {
+      df$Date <- date
+    }else{
+      df$Date <- date[1]
+    }
+  }else{
+    df$Date <- c(NA)
+  }
+  affiliation <- scrape_rvest(url, ".o-metadata__affiliation")
+  if(!identical(affiliation, character(0))) {
+    df$AuthorAffiliation <- paste(affiliation, collapse = ", ")
+  }else{
+    df$AuthorAffiliation <- c(NA)
+  }
+target <- c("Citation", "Abstract", "Methods", "Data Files", "Authors", "AuthorAffiliation", "Date")
+for(i in target) {
+  if(!(i %in% names(df))) {
+    df[i] <- c(NA)
+  }
 }
-file_info$sizeMB <- numbers
-file_info <- nest(file_info)
-}
-names(df) <- cols[1:length(data)]
-df$`Data Files` <- file_info
-df$Methods <- scrape_rvest(url, ".t-landing__text-wall:nth-child(8) p:nth-child(1)")
-df$Authors <- paste(scrape_rvest(url, ".o-metadata__author"), collapse = "; ")
-df
+df[target]
 ```
 
 ```{r}
@@ -77,7 +114,7 @@ authors[1]
 # Iterate dryad
 df <- data.frame(matrix(ncol = 5, nrow = 0))
 count <- 0
-for(i in 1:4169) {
+for(i in 1:41864) {
   url <- paste("https://datadryad.org/search?page=", i, "&q=", sep = "")
   pg <- read_html(url)
   links <- html_attr(html_nodes(pg, "#documents a"), "href")
@@ -89,7 +126,10 @@ for(i in 1:4169) {
     print(nrow(df))
   }
 }
-df
+file_info <- df$`Data Files`
+file_info <- unnest(file_info, cols = c())
+file_info
+scrape_dryad("https://datadryad.org/stash/dataset/doi:10.5061/dryad.mkkwh70xh")
 ```
 
 
@@ -197,7 +237,7 @@ for(i in links$links) {
   data_link <- paste(basic_link, i, sep = "")
   full_df <- rbind(full_df, scrape_cdph(data_link))
 }
-full_df
+df
 ```
 
 ```{r}
@@ -358,14 +398,16 @@ if(!identical(citation, character(0))) {
   }
 }
 df <- mutate(df, FileInfo <- file_info)
-df[, c("Name", "Authors", "Unique views", "Unique downloads", "Publication date:", "Keyword(s):", "data", "Communities:")]
+file_info <- unnest(file_info)
+df <- mutate(df, FileName = paste(file_info$Name, collapse = ", "), SizeMB = paste(file_info$SizeMB, collapse = ", "))
+df <- df[, c("Name", "Authors", "Unique views", "Unique downloads", "Publication date:", "Keyword(s):", "Communities:", "FileName", "SizeMB")]
 
 scrape_zenodo("https://zenodo.org/record/5081153#.YOZkbi1h23U")
-read.csv("./Data/dryad_scraped.csv")
 ```
+
 ```{r}
 full_df <- data.frame(matrix(ncol = 8, nrow = 0))
-for(i in 1:200) {
+for(i in 1:1) {
   url <- paste("https://zenodo.org/search?page=", i, "&size=20#", sep = "")
   url <- "https://zenodo.org"
   pg <- read_html(url)
@@ -377,14 +419,11 @@ for(i in 1:200) {
     print(nrow(full_df))
   }
 }
-cdph <- read.csv("./Data/cdph_scraped.csv")
-url <- "https://zenodo.org/search?page=1&size=20"
-pg <- read_html(url)
-links <- html_attr(html_nodes(pg, "h4 .ng-binding"), "href")
 ```
 
 ```{r}
-# Merge things
-corgis <- read.csv(".Data/CORGIS_metadata.csv")
-datagov <- read.csv("./Data/datagov_scraped.csv")
+# Merge common data
+corgis <- read.csv(".Data/CORGIS_metadata.csv", header = TRUE, sep = ";", dec = ",", stringsAsFactors = FALSE)
+cdph <- read.csv("./Data/cdph_scraped.csv")
+dryad <- read.csv("./Data/dryad_scraped.csv")
 ```
