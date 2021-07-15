@@ -265,18 +265,18 @@ clean_tag <- str_split(full_df$Tags, "[ ]+") %>%
 clean_tag <- str_remove_all(clean_tag$., c("c[{]", "[)]", "[\"]")) %>%
   data.frame()
 ```
+
 ```{r}
-url <- "https://catalog.data.gov/dataset/2006-2012-math-test-results-district-all-students"
+url <- "https://catalog.data.gov/dataset/boreas-tf-01-ssa-oa-weekly-tower-ch4-and-n2o-flux"
 cols <- c(Frost2021Package::scrape_rvest(url, ".module-heading , .table-toggle-less tr+ tr .dataset-label , #access-use h3"), scrape_rvest(url, ".dataset-label"))
 data <- c(scrape_rvest(url, ".module-narrow a"), scrape_rvest(url, ".table-toggle-less a , .dataset-details , td > span , #sec-dates td"))
-data
 cols <- cols %>% data.frame() %>% distinct()
 cols <- cols$.
 data <- data %>% data.frame() %>% rowid_to_column() %>% filter(rowid > 2)
 data <- data$.
 df <- data.frame(matrix(ncol = length(cols), nrow = 0))
 df <- rbind(df, data)
-names(df) <- cols
+names(df) <- cols[1:ncol(df)]
 social <- scrape_rvest(url, ".social a")
 string <- ""
 for(i in social) {
@@ -300,15 +300,23 @@ access <- access$access
 access <- str_remove_all(access, ":")
 access <- paste(access, collapse = ", ")
 df$`Access & Use Information` <- access
-
-scrape_datagov("https://catalog.data.gov/dataset/2006-2011-nys-math-test-results-by-grade-citywide-by-race-ethnicity")
-harvard <- scrape_harvard("https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/VUAIMQ")
-unnest(harvard$`File Data`)
+df$Tags <- checkNull(scrape_rvest(url, ".well"))
+df$Name <- checkNull(scrape_rvest(url, ".prose h1"))
+df$Description <- checkNull(scrape_rvest(url, ".embedded-content p"))
+df$Maintainer <- checkNull(scrape_rvest(url, ".table-toggle-less a"))
+target <- c("Name", "Description", "Metadata Created Date", "Metadata Updated Date", "Publisher", "Tags", "Category", "Maintainer")
+for(i in target) {
+    if(!(i %in% names(df))) {
+      df[i] <- c(NA)
+    }
+  }
+df[target]
+#scrape_datagov("https://catalog.data.gov/dataset/department-for-the-aging-dfta-geriatric-mental-health-contracted-providers")
 ```
 
 ```{r}
 # Iterate data.gov
-full_df <- data.frame(matrix(ncol = 24, nrow = 0))
+full_df <- data.frame(matrix(ncol = 8, nrow = 0))
 for(i in 1:15391) {
   url <- paste("https://catalog.data.gov/dataset?page=", i, sep = "")
   pg <- read_html(url)
@@ -318,18 +326,11 @@ for(i in 1:15391) {
   links <- links$.
   for(j in links) {
     scraped <- scrape_datagov(j)
-    print(j)
-    for(k in names(scraped)) {
-      if(!(k %in% names(full_df))) {
-        scraped[k] <- c(NA)
-      }
-    }
+    cat("\014")
+    print(paste("Link:", j, "nrow =", nrow(full_df)))
     full_df <- rbind(full_df, scraped)
   }
-  print(nrow(full_df))
 }
-
-full_df <- read.csv("./Data/cdph_scraped.csv")
 ```
 
 ```{r}
@@ -426,7 +427,19 @@ for(i in 1:1) {
 
 ```{r}
 # Merge common data
-corgis <- read.csv(".Data/CORGIS_metadata.csv", header = TRUE, sep = ";", dec = ",", stringsAsFactors = FALSE)
+corgis <- read.csv("./Data/CORGIS_metadata.csv")
 cdph <- read.csv("./Data/cdph_scraped.csv")
-dryad <- read.csv("./Data/dryad_scraped.csv")
+datagov <- read.csv("./Data/harvard_scraped.csv")
+datahub <- read.csv("./Data/datahub_scraped.csv")
+uci <- read.csv("./Data/UCI_metadata.csv")
+zenodo <- read.csv("./Data/zenodo_scraped.csv")
+
+cols <- c("Name", "Published", "Author", "Tags", "Author Affiliation", "Downloads", "Views")
+
+# Merge keywords
+keywords <- c(datagov$Tags, cdph$Tags, corgis$tags, datagov$Topics)
+mdf <- data.frame(matrix(ncol = length(names(cdph))+length(names(corgis))+length(names(datagov))+length(names(datahub))+length(names(uci))+length(names(zenodo)), nrow = 1))
+names(mdf) <- c(names(corgis), names(cdph), names(datagov), names(datahub), names(uci), names(zenodo))
+dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo)
+target(corgis, names(mdf))
 ```

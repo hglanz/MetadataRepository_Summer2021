@@ -10,14 +10,13 @@
 scrape_datagov <- function(url) {
   cols <- c(Frost2021Package::scrape_rvest(url, ".module-heading , .table-toggle-less tr+ tr .dataset-label , #access-use h3"), scrape_rvest(url, ".dataset-label"))
   data <- c(scrape_rvest(url, ".module-narrow a"), scrape_rvest(url, ".table-toggle-less a , .dataset-details , td > span , #sec-dates td"))
-  data
   cols <- cols %>% data.frame() %>% distinct()
   cols <- cols$.
   data <- data %>% data.frame() %>% rowid_to_column() %>% filter(rowid > 2)
   data <- data$.
   df <- data.frame(matrix(ncol = length(cols), nrow = 0))
   df <- rbind(df, data)
-  names(df) <- cols
+  names(df) <- cols[1:ncol(df)]
   social <- scrape_rvest(url, ".social a")
   string <- ""
   for(i in social) {
@@ -41,5 +40,15 @@ scrape_datagov <- function(url) {
   access <- str_remove_all(access, ":")
   access <- paste(access, collapse = ", ")
   df$`Access & Use Information` <- access
-  return(df)
+  df$Tags <- checkNull(scrape_rvest(url, ".well"))
+  df$Name <- checkNull(scrape_rvest(url, ".prose h1"))
+  df$Description <- checkNull(scrape_rvest(url, ".embedded-content p")) %>% paste(collapse = "")
+  df$Maintainer <- checkNull(scrape_rvest(url, ".table-toggle-less a"))
+  target <- c("Name", "Description", "Metadata Created Date", "Metadata Updated Date", "Publisher", "Tags", "Category", "Maintainer")
+  for(i in target) {
+    if(!(i %in% names(df))) {
+      df[i] <- c(NA)
+    }
+  }
+  return(df[target])
 }
