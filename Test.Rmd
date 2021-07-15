@@ -438,8 +438,9 @@ cols <- c("Name", "Published", "Author", "Tags", "Author Affiliation", "Download
 
 # Merge keywords
 keywords <- c(datagov$Tags, cdph$Tags, corgis$tags, datagov$Topics)
-mdf <- data.frame(matrix(ncol = length(names(cdph))+length(names(corgis))+length(names(datagov))+length(names(datahub))+length(names(uci))+length(names(zenodo)), nrow = 1))
+mdf <- data.frame(matrix(ncol = length(names(cdph))+length(names(corgis))+length(names(datagov))+length(names(datahub))+length(names(uci))+length(names(zenodo)), nrow = 0))
 names(mdf) <- c(names(corgis), names(cdph), names(datagov), names(datahub), names(uci), names(zenodo))
 dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo)
-target(corgis, names(mdf))
+mdf <- rbind(mdf, target(corgis, names(mdf)), target(cdph, names(mdf)), target(datagov, names(mdf)), target(datahub, names(mdf)), target(uci, names(mdf)), target(zenodo, names(mdf)))
+mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
 ```
