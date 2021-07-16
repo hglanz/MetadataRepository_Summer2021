@@ -14,6 +14,7 @@ library(XML)
 library(purrr)
 library(bestpredictor)
 library(lubridate)
+library(DT)
 ```
 
 ```{r}
@@ -443,4 +444,5 @@ names(mdf) <- c(names(corgis), names(cdph), names(datagov), names(datahub), name
 dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo)
 mdf <- rbind(mdf, target(corgis, names(mdf)), target(cdph, names(mdf)), target(datagov, names(mdf)), target(datahub, names(mdf)), target(uci, names(mdf)), target(zenodo, names(mdf)))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
+datatable(mdf)
 ```
