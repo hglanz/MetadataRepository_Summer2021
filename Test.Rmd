@@ -459,9 +459,10 @@ for(i in link) {
     i <- paste("https:", i, sep = "")
   }
   print(i)
+  print(nrow(full_df))
   tryCatch(expr = {
     full_df <- rbind(full_df, scrape_figshare(i))
-  }, error = {
+  }, error = function(err) {
     NULL
   })
   cat("\014")
@@ -487,6 +488,5 @@ names(mdf) <- c(names(corgis), names(cdph), names(datagov), names(datahub), name
 dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo)
 mdf <- rbind(mdf, target(corgis, names(mdf)), target(cdph, names(mdf)), target(datagov, names(mdf)), target(datahub, names(mdf)), target(uci, names(mdf)), target(zenodo, names(mdf)))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
-datatable(mdf)
-mdf
+datatable(head(mdf), editable = "cell")
 ```

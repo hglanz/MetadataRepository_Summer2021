@@ -1,0 +1,35 @@
+---
+title: "DT Tester"
+author: "Sucheen Sundaram"
+date: "7/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(Frost2021Package)
+library(DT)
+```
+
+
+```{r}
+# Merge common data
+corgis <- read.csv("./Data/CORGIS_metadata.csv")
+cdph <- read.csv("./Data/cdph_scraped.csv")
+datagov <- read.csv("./Data/harvard_scraped.csv")
+datahub <- read.csv("./Data/datahub_scraped.csv")
+uci <- read.csv("./Data/UCI_metadata.csv")
+zenodo <- read.csv("./Data/zenodo_scraped.csv")
+
+cols <- c("Name", "Published", "Author", "Tags", "Author Affiliation", "Downloads", "Views")
+
+# Merge keywords
+keywords <- c(datagov$Tags, cdph$Tags, corgis$tags, datagov$Topics, uci$tags, zenodo$Keyword.s..)
+mdf <- data.frame(matrix(ncol = length(names(cdph))+length(names(corgis))+length(names(datagov))+length(names(datahub))+length(names(uci))+length(names(zenodo)), nrow = 0))
+names(mdf) <- c(names(corgis), names(cdph), names(datagov), names(datahub), names(uci), names(zenodo))
+dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo)
+mdf <- rbind(mdf, target(corgis, names(mdf)), target(cdph, names(mdf)), target(datagov, names(mdf)), target(datahub, names(mdf)), target(uci, names(mdf)), target(zenodo, names(mdf)))
+mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
+datatable(mdf, editable = "cell")
+```
