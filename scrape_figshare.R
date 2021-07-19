@@ -9,6 +9,9 @@
 
 scrape_figshare <- function(url) {
   name <- scrape_rvest(url, "._3lGK4")
+  if(checkNull(name) != name) {
+    name <- scrape_rvest(url, "h1 div")
+  }
   description <- scrape_rvest(url, "._1dO13")
   cols <- scrape_rvest(url, "._36trp , ._14z3R , ._1qu0d+ span")
   categories <- scrape_rvest(url, "li")
@@ -17,6 +20,13 @@ scrape_figshare <- function(url) {
   date <- checkNull(date)
   exports <- scrape_rvest(url, "button span")
   exports <- exports[exports != "Select an option"]
-  df <- data.frame(Name = name, Description = description, Categories = paste(categories, collapse = ", "), Keywords = paste(keywords, collapse = ", "), Date = date, Exports = paste(exports, collapse = ", "))
+  file_info_cols <- c("FileName", "Size")
+  file_info_data <- checkNull(scrape_rvest(url, "._1KU5g span"))
+  df <- data.frame(Name = checkNull(name), Description = checkNull(description), Categories = checkNull(paste(categories, collapse = ", ")), Keywords = checkNull(paste(keywords, collapse = ", ")), Date = checkNull(date), Exports = checkNull(paste(exports, collapse = ", ")))
+  count <- 1
+  for(i in file_info_cols) {
+    df[i] <- checkNull(file_info_data[count])
+    count <- count+1
+  }
   return(df)
 }

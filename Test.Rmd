@@ -427,6 +427,49 @@ for(i in 1:1) {
 ```
 
 ```{r}
+url <- "https://figshare.com/articles/journal_contribution/The_Inhibitors_to_Information_Seeking_Behavior_of_Nursing_Students_in_General_English_and_ESP_Courses_from_University_Instructors_Perspective_A_Case_Study/14999532"
+name <- scrape_rvest(url, "._3lGK4")
+description <- scrape_rvest(url, "._1dO13")
+cols <- scrape_rvest(url, "._36trp , ._14z3R , ._1qu0d+ span")
+categories <- scrape_rvest(url, "li")
+keywords <- scrape_rvest(url, "._3v5nv span")
+date <- scrape_rvest(url, "._1qu0d")
+date <- checkNull(date)
+exports <- scrape_rvest(url, "button span")
+exports <- exports[exports != "Select an option"]
+file_info_cols <- c("FileName", "Size")
+file_info_data <- checkNull(scrape_rvest(url, "._1KU5g span"))
+df <- data.frame(Name = checkNull(name), Description = checkNull(description), Categories = checkNull(paste(categories, collapse = ", ")), Keywords = checkNull(paste(keywords, collapse = ", ")), Date = checkNull(date), Exports = checkNull(paste(exports, collapse = ", ")))
+count <- 1
+for(i in file_info_cols) {
+  df[i] <- checkNull(file_info_data[count])
+  count <- count+1
+}
+df
+
+Frost2021Package::scrape_figshare("https://figshare.com/articles/journal_contribution/The_Inhibitors_to_Information_Seeking_Behavior_of_Nursing_Students_in_General_English_and_ESP_Courses_from_University_Instructors_Perspective_A_Case_Study/14999532")
+```
+
+```{r}
+# Iterate Figshare
+link <- Frost2021Package::links("https://figshare.com/browse", "a")
+full_df <- data.frame(matrix(ncol = 8, nrow = 0))
+for(i in link) {
+  if(!str_detect(i, "https://")) {
+    i <- paste("https:", i, sep = "")
+  }
+  print(i)
+  tryCatch(expr = {
+    full_df <- rbind(full_df, scrape_figshare(i))
+  }, error = {
+    NULL
+  })
+  cat("\014")
+}
+```
+
+
+```{r}
 # Merge common data
 corgis <- read.csv("./Data/CORGIS_metadata.csv")
 cdph <- read.csv("./Data/cdph_scraped.csv")
@@ -445,7 +488,5 @@ dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo)
 mdf <- rbind(mdf, target(corgis, names(mdf)), target(cdph, names(mdf)), target(datagov, names(mdf)), target(datahub, names(mdf)), target(uci, names(mdf)), target(zenodo, names(mdf)))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
 datatable(mdf)
-
-Frost2021Package::predictors(mdf, "Tags")
-mdf$Description
+mdf
 ```
