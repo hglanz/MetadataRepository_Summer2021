@@ -471,6 +471,21 @@ for(i in link) {
 
 
 ```{r}
+url <- "https://www.re3data.org/repository/r3d100010129"
+cols <- scrape_rvest(url, ".col-sm-3")[1:13]
+data <- scrape_rvest(url, ".col-sm-9")[1:13]
+df <- cbind(cols, data) %>% data.frame() %>% pivot_wider(names_from = cols, values_from = data)
+df$`Subject(s)` <- scrape_rvest(url, ".subjects") %>% paste(collapse = ", ")
+inst_cols <- scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(11) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(9) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(7) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(1) .col-sm-3")[1:4]
+inst_cols <- inst_cols[inst_cols != "Type(s) of responsibility"]
+inst_data <- scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(11) .col-sm-9 , .content-block:nth-child(1) .country , .content-block:nth-child(1) .col-sm-12:nth-child(1) .col-sm-9")
+df <- c(df, inst_data)
+df <- df %>% data.frame()
+names(df)
+```
+
+
+```{r}
 # Merge common data
 corgis <- read.csv("./Data/CORGIS_metadata.csv")
 cdph <- read.csv("./Data/cdph_scraped.csv")
