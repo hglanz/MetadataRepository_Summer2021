@@ -9,6 +9,7 @@
 #' @param col1, the first column
 #' @param col2, the second column
 #' @return merged dataframe
+#' @export
 
 merge_and_drop <- function(df, col1, col2) {
   for(i in 1:nrow(df)) {
