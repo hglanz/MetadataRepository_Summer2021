@@ -479,9 +479,10 @@ df$`Subject(s)` <- scrape_rvest(url, ".subjects") %>% paste(collapse = ", ")
 inst_cols <- scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(11) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(9) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(7) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(1) .col-sm-3")[1:4]
 inst_cols <- inst_cols[inst_cols != "Type(s) of responsibility"]
 inst_data <- scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(11) .col-sm-9 , .content-block:nth-child(1) .country , .content-block:nth-child(1) .col-sm-12:nth-child(1) .col-sm-9")
+df$Responsibility <- paste(checkNull(scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(9) li")), collapse = ", ")
 df <- c(df, inst_data)
 df <- df %>% data.frame()
-names(df)
+df[, 1:10]
 ```
 
 
@@ -503,5 +504,31 @@ names(mdf) <- c(names(corgis), names(cdph), names(datagov), names(datahub), name
 dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo)
 mdf <- rbind(mdf, target(corgis, names(mdf)), target(cdph, names(mdf)), target(datagov, names(mdf)), target(datahub, names(mdf)), target(uci, names(mdf)), target(zenodo, names(mdf)))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
-datatable(head(mdf), editable = "cell")
+mdf
 ```
+
+```{r}
+# Shift and drop method function
+col1 <- "Authors"
+col2 <- "author"
+for(i in 1:nrow(df)) {
+  if(!is.na(df[i, col2]) & is.na(df[i, col1])) {
+    df[i, col1] <- df[i, col2]
+  }
+}
+df
+```
+
+```{r}
+mdf <- merge_and_drop(mdf, "Authors", "author")
+cross <- crossing(var1 = 1:ncol(mdf), var2 = 1:ncol(mdf))
+cross <- mutate(cross, score = map2_dbl(cross$var1, cross$var2, ~similarity_score(.x, .y)))
+cross <- mutate(cross, name1 = names(mdf)[var1], name2 = names(mdf)[var2])
+cross %>%
+  filter(score >= 0.5 & name1 != name2, !is.numeric(names(mdf)[var1]) & !is.numeric(names(mdf)[var2]))
+map_mdf <- map2_dfr(cross$name1[!is.numeric(cross$name1)] %>% data.frame() %>% distinct() %>% c(), cross$name2[!is.numeric(cross$name2)] %>% data.frame() %>% distinct() %>% c(), ~merge_and_drop(mdf, .x, .y))
+names(mdf)
+mdf <- merge_and_drop(mdf, "Tags", "Keyword.s..")
+
+```
+
