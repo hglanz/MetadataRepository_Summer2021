@@ -526,8 +526,18 @@ cross <- mutate(cross, score = map2_dbl(cross$var1, cross$var2, ~similarity_scor
 cross <- mutate(cross, name1 = names(mdf)[var1], name2 = names(mdf)[var2])
 cross %>%
   filter(score >= 0.5 & name1 != name2, !is.numeric(names(mdf)[var1]) & !is.numeric(names(mdf)[var2]))
-map_mdf <- map2_dfr(cross$name1[!is.numeric(cross$name1)] %>% data.frame() %>% distinct() %>% c(), cross$name2[!is.numeric(cross$name2)] %>% data.frame() %>% distinct() %>% c(), ~merge_and_drop(mdf, .x, .y))
-names(mdf)
+#map_mdf <- map2_dfr(cross$name1[!is.numeric(cross$name1)] %>% data.frame() %>% distinct() %>% c(), cross$name2[!is.numeric(cross$name2)] %>% data.frame() %>% distinct() %>% c(), ~merge_and_drop(mdf, .x, .y))
 mdf <- merge_and_drop(mdf, "Name", "title")
+mdf <- merge_and_drop(mdf, "Publisher", "publisher")
+names(mdf)
+mdf <- merge_and_drop(mdf, "file_size", "X.Size.")
+mdf <- merge_and_drop(mdf, "file_size", "SizeMB")
+mdf <- merge_and_drop(mdf, "Tags", "tags")
+mdf <- merge_and_drop(mdf, "Tags", "Keyword.s..")
+mdf <- merge_and_drop(mdf, "Created", "X.Created.")
+mdf <- merge_and_drop(mdf, "Created", "date_created")
+mdf <- merge_and_drop(mdf, "Created", "Metadata.Created.Date")
+mdf <- merge_and_drop(mdf, "Last.Updated", "Metadata.Updated.Date")
+mdf <- merge_and_drop(mdf, "Last.Updated", "X.Updated.")
+mdf
 ```
-
