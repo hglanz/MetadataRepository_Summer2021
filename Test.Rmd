@@ -528,7 +528,6 @@ cross %>%
   filter(score >= 0.5 & name1 != name2, !is.numeric(names(mdf)[var1]) & !is.numeric(names(mdf)[var2]))
 map_mdf <- map2_dfr(cross$name1[!is.numeric(cross$name1)] %>% data.frame() %>% distinct() %>% c(), cross$name2[!is.numeric(cross$name2)] %>% data.frame() %>% distinct() %>% c(), ~merge_and_drop(mdf, .x, .y))
 names(mdf)
-mdf <- merge_and_drop(mdf, "Tags", "Keyword.s..")
-
+mdf <- merge_and_drop(mdf, "Name", "title")
 ```
 
