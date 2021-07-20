@@ -539,5 +539,4 @@ mdf <- merge_and_drop(mdf, "Created", "date_created")
 mdf <- merge_and_drop(mdf, "Created", "Metadata.Created.Date")
 mdf <- merge_and_drop(mdf, "Last.Updated", "Metadata.Updated.Date")
 mdf <- merge_and_drop(mdf, "Last.Updated", "X.Updated.")
-mdf
 ```
