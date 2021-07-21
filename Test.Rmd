@@ -135,7 +135,7 @@ scrape_dryad("https://datadryad.org/stash/dataset/doi:10.5061/dryad.mkkwh70xh")
 
 
 ```{r}
-url <- "https://dataverse.harvard.edu/dataverse/TrumpTweets2020;jsessionid=639f9c1b20298462c57f46db93ef"
+url <- "https://dataverse.harvard.edu/dataverse/gemilang;jsessionid=a20dacca3200c53eeb823f127187"
 name <- scrape_rvest(url, "#title")
   cols <- scrape_rvest(url, "#metrics-heading , th")
   data <- scrape_rvest(url, ".metrics-count-block , td")
@@ -188,8 +188,8 @@ name <- scrape_rvest(url, "#title")
   df$Name <- checkNull(name)
   df$`Deposit Date` <- checkNull(scrape_rvest(url, "#metadata_dateOfDeposit td"))
   df$Citation <- checkNull(scrape_rvest(url, ".citation-select"))
-  
   target <- c("Name", "Description", "Subject", "Keyword", "Deposit Date", "Author", "Depositor", "Citation", "FileName", "Downloads", "Variables", "Observations")
+  df$Depositor <- checkNull(scrape_rvest(url, "#metadata_depositor td"))
   for(i in target) {
     if(!(i %in% names(df))) {
       df[i] <- c(NA)
@@ -200,19 +200,18 @@ name <- scrape_rvest(url, "#title")
 
 ```{r}
 full_df <- data.frame(matrix(ncol = 12, nrow = 0))
-for(i in 1:11395) {
+for(i in 1:11944) {
   url <- paste("https://dataverse.harvard.edu/dataverse/harvard?q=&types=dataverses%3Adatasets&sort=dateSort&order=desc&page=", i, sep = "")
-  pg <- read_html(url)
-  links <- html_attr(html_nodes(pg, ".card-title-icon-block a"), "href")
+  links <- Frost2021Package::links(url, ".card-title-icon-block a")
   links <- paste("https://dataverse.harvard.edu", links, sep = "")
-  links <- data.frame(links) %>% distinct()
-  links <- links$links
+  links <- links[str_detect(links, "/dataset")]
   for(j in links) {
     print(j)
+    print(nrow(full_df))
     full_df <- rbind(full_df, scrape_harvard(j))
+    cat("\014")
   }
 }
-full_df
 ```
 
 
@@ -529,7 +528,6 @@ cross %>%
 #map_mdf <- map2_dfr(cross$name1[!is.numeric(cross$name1)] %>% data.frame() %>% distinct() %>% c(), cross$name2[!is.numeric(cross$name2)] %>% data.frame() %>% distinct() %>% c(), ~merge_and_drop(mdf, .x, .y))
 mdf <- merge_and_drop(mdf, "Name", "title")
 mdf <- merge_and_drop(mdf, "Publisher", "publisher")
-names(mdf)
 mdf <- merge_and_drop(mdf, "file_size", "X.Size.")
 mdf <- merge_and_drop(mdf, "file_size", "SizeMB")
 mdf <- merge_and_drop(mdf, "Tags", "tags")
