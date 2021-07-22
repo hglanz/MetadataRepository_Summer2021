@@ -567,6 +567,7 @@ for(i in 1:nrow(mdf)) {
 mdf$Variables <- vec
 mdf <- merge_and_drop(mdf, "Variables", "ncols")
 mdf <- merge_and_drop(mdf, "Observations", "nrows")
+mdf <- clean(mdf)
 ```
 
 ```{r}
