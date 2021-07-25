@@ -507,7 +507,6 @@ names(mdf) <- c(names(corgis), names(cdph), names(datagov), names(datahub), name
 dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo, harvard)
 mdf <- rbind(mdf, target(corgis, names(mdf)), target(cdph, names(mdf)), target(datagov, names(mdf)), target(datahub, names(mdf)), target(uci, names(mdf)), target(zenodo, names(mdf)), target(harvard, names(mdf)))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
-mdf
 ```
 
 ```{r}
@@ -568,6 +567,7 @@ mdf$Variables <- vec
 mdf <- merge_and_drop(mdf, "Variables", "ncols")
 mdf <- merge_and_drop(mdf, "Observations", "nrows")
 mdf <- clean(mdf)
+Frost2021Package::cl
 ```
 
 ```{r}
