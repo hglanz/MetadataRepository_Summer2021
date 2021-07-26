@@ -523,6 +523,7 @@ df
 
 ```{r}
 mdf <- merge_and_drop(mdf, "Authors", "author")
+mdf <- merge_and_drop(mdf, "Authors", "Author")
 cross <- crossing(var1 = 1:ncol(mdf), var2 = 1:ncol(mdf))
 cross <- mutate(cross, score = map2_dbl(cross$var1, cross$var2, ~similarity_score(.x, .y)))
 cross <- mutate(cross, name1 = names(mdf)[var1], name2 = names(mdf)[var2])
@@ -540,34 +541,53 @@ mdf <- merge_and_drop(mdf, "Created", "date_created")
 mdf <- merge_and_drop(mdf, "Created", "Metadata.Created.Date")
 mdf <- merge_and_drop(mdf, "Last.Updated", "Metadata.Updated.Date")
 mdf <- merge_and_drop(mdf, "Last.Updated", "X.Updated.")
+for(i in 1:nrow(mdf)) {
+  mdf[i, "Downloads"] <- str_split(mdf$Downloads, ", ") %>%
+  pluck(i) %>%
+  parse_number() %>%
+  sum(na.rm = TRUE)
+}
 vec <- c()
 for(i in 1:nrow(mdf)) {
-  vec <- append(vec, str_split(mdf[i, "Downloads"], pattern = ", ") %>%
-    pluck(1) %>%
-    parse_number() %>%
-    sum(na.rm = TRUE))
+  mdf[i, "Observations"] <- str_split(mdf$Observations, ", ") %>%
+  pluck(i) %>%
+  parse_number() %>%
+  sum(na.rm = TRUE)
 }
-mdf$Downloads <- vec
 vec <- c()
 for(i in 1:nrow(mdf)) {
-  vec <- append(vec, str_split(mdf[i, "Observations"], pattern = ", ") %>%
-    pluck(1) %>%
-    parse_number() %>%
-    sum(na.rm = TRUE))
+  mdf[i, "Variables"] <- str_split(mdf$Variables, ", ") %>%
+  pluck(i) %>%
+  parse_number() %>%
+  sum(na.rm = TRUE)
 }
-mdf$Observations <- vec
-vec <- c()
-for(i in 1:nrow(mdf)) {
-  vec <- append(vec, str_split(mdf[i, "Variables"], pattern = ", ") %>%
-    pluck(1) %>%
-    parse_number() %>%
-    sum(na.rm = TRUE))
-}
-mdf$Variables <- vec
 mdf <- merge_and_drop(mdf, "Variables", "ncols")
 mdf <- merge_and_drop(mdf, "Observations", "nrows")
 mdf <- clean(mdf)
-Frost2021Package::cl
+for(i in 1:nrow(mdf)) {
+  mdf[i, "file_size"] <- str_split(mdf$file_size, ", ") %>%
+  pluck(i) %>%
+  parse_number() %>%
+  sum(na.rm = TRUE)
+}
+mdf$num_authors <- str_split(mdf$Authors, ", ") %>%
+  str_split(" and ") %>%
+  str_split("; ") %>%
+  sapply(length)
+for(i in 1:nrow(mdf)) {
+  if(mdf[i, "Variables"] == "0") {
+    mdf[i, "Variables"] <- as.character(mdf[i, "nnum_vars"] + mdf[i, "nchar_vars"])
+  }
+}
+split <- str_split(mdf$Authors, ", ") %>%
+  str_split(" and ") %>%
+  str_split(", ")
+split[!is.na(split)]
+for(i in 1:nrow(mdf)) {
+  mdf[i, "num_authors"] <- split %>%
+  pluck(i) %>%
+  length()
+}
 ```
 
 ```{r}
@@ -589,5 +609,10 @@ for(i in 1:11944) {
     #cat("\014")
   }
 }
+```
+
+
+```{r}
+
 ```
 

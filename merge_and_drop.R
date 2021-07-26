@@ -1,6 +1,5 @@
 #' This function perfoms the merge-and-drop technique for condensing the metadata dataframe as discussed at a meeting. Shifts from col2 to col1.
 #' @import rvest
-#' @import Frost2021Package
 #' @import dplyr
 #' @import magrittr
 #' @import stringr
