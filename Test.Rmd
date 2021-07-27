@@ -15,6 +15,7 @@ library(purrr)
 library(bestpredictor)
 library(lubridate)
 library(DT)
+library(rdryad)
 ```
 
 ```{r}
@@ -454,7 +455,7 @@ Frost2021Package::scrape_figshare("https://figshare.com/articles/journal_contrib
 
 ```{r}
 # Iterate Figshare
-link <- Frost2021Package::links("https://figshare.com/browse", "a")
+link <- Frost2021Package::links("https://figshare.com/search", ".PzqLM")
 full_df <- data.frame(matrix(ncol = 8, nrow = 0))
 for(i in link) {
   if(!str_detect(i, "https://")) {
@@ -475,16 +476,17 @@ for(i in link) {
 ```{r}
 url <- "https://www.re3data.org/repository/r3d100010129"
 cols <- scrape_rvest(url, ".col-sm-3")[1:13]
-data <- scrape_rvest(url, ".col-sm-9")[1:13]
-df <- cbind(cols, data) %>% data.frame() %>% pivot_wider(names_from = cols, values_from = data)
-df$`Subject(s)` <- scrape_rvest(url, ".subjects") %>% paste(collapse = ", ")
-inst_cols <- scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(11) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(9) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(7) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(1) .col-sm-3")[1:4]
-inst_cols <- inst_cols[inst_cols != "Type(s) of responsibility"]
-inst_data <- scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(11) .col-sm-9 , .content-block:nth-child(1) .country , .content-block:nth-child(1) .col-sm-12:nth-child(1) .col-sm-9")
-df$Responsibility <- paste(checkNull(scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(9) li")), collapse = ", ")
-df <- c(df, inst_data)
-df <- df %>% data.frame()
-df[, 1:10]
+  data <- scrape_rvest(url, ".col-sm-9")[1:13]
+  df <- cbind(cols, data) %>% data.frame() %>% pivot_wider(names_from = cols, values_from = data)
+  df$`Subject(s)` <- scrape_rvest(url, ".subjects") %>% paste(collapse = ", ")
+  inst_cols <- scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(11) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(9) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(7) .col-sm-3 , .content-block:nth-child(1) .col-sm-12:nth-child(1) .col-sm-3")[1:4]
+  inst_cols <- inst_cols[inst_cols != "Type(s) of responsibility"]
+  inst_data <- scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(11) .col-sm-9 , .content-block:nth-child(1) .country , .content-block:nth-child(1) .col-sm-12:nth-child(1) .col-sm-9")
+  df$Responsibility <- paste(checkNull(scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(9) li")), collapse = ", ")
+  df$Date <- checkNull(paste(scrape_rvest(url, ".content-block .col-sm-12:nth-child(5) .col-sm-9"), sep = "")[6])
+  df <- c(df, inst_data)
+  df <- df %>% data.frame()
+  df[c("Name.of.repository", "Repository.URL", "Subject.s.", "Description", "Contact", "Content.type.s.", "Keyword.s.", "Repository.type.s.", "Responsibility", "Date")]
 ```
 
 
@@ -588,6 +590,7 @@ for(i in 1:nrow(mdf)) {
   pluck(i) %>%
   length()
 }
+read.csv("./Data/mdf.csv")
 ```
 
 ```{r}
@@ -613,6 +616,44 @@ for(i in 1:11944) {
 
 
 ```{r}
+mdf <- read.csv("./Data/mdf.csv")
+mdf <- mdf[names(mdf) != "X.1" & names(mdf) != "rowid"]
+for(i in 1:nrow(mdf)) {
+  if(!is.na(mdf[i, "Authors"])) {
+    if(str_detect(mdf[i, "Authors"], ";")) {
+      split <- str_split(mdf[i, "Authors"], "; ")
+    }else if(str_detect(mdf[i, "Authors"], ",")) {
+      split <- str_split(mdf[i, "Authors"], ", ")
+    }else if(str_detect(mdf[i, "Authors"], "and")) {
+      split <- str_split(mdf[i, "Authors"], " and ")
+    }else{
+      split <- list("Null")
+    }
+    mdf[i, "num_authors"] <- split %>% pluck(1) %>% length()
+  }
+}
+```
 
+```{r}
+# Iterate re3data
+full_df <- data.frame(matrix(ncol = 10, nrow = 0))
+for(i in 1:109) {
+  link <- links(paste("https://www.re3data.org/search?query=&page=", i, sep = ""), "a")
+  link <- link %>% data.frame() %>% distinct()
+  link <- link$.
+  link <- link[str_detect(link, "/repository") & !is.na(link)]
+  link <- paste("https://re3data.org", link, sep = "")
+  for(j in link) {
+    print(j)
+    print(nrow(full_df))
+    tryCatch(expr = {
+      full_df <- rbind(full_df, scrape_re3data(j))
+    }, error = function(error) {
+      NULL
+    })
+    cat("\014")
+  }
+}
+full_df
 ```
 
