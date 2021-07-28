@@ -483,7 +483,10 @@ cols <- scrape_rvest(url, ".col-sm-3")[1:13]
   inst_cols <- inst_cols[inst_cols != "Type(s) of responsibility"]
   inst_data <- scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(11) .col-sm-9 , .content-block:nth-child(1) .country , .content-block:nth-child(1) .col-sm-12:nth-child(1) .col-sm-9")
   df$Responsibility <- paste(checkNull(scrape_rvest(url, ".content-block:nth-child(1) .col-sm-12:nth-child(9) li")), collapse = ", ")
-  df$Date <- checkNull(paste(scrape_rvest(url, ".content-block .col-sm-12:nth-child(5) .col-sm-9"), sep = "")[6])
+  df$Date <- checkNull(scrape_rvest(url, ".col-sm-12 .content-block .col-sm-12:nth-child(5) .col-sm-9"))
+  if(is.na(df$`Name of repository`)) {
+    df$Name.of.repository <- checkNull(scrape_rvest(url, "h1"))
+  }
   df <- c(df, inst_data)
   df <- df %>% data.frame()
   df[c("Name.of.repository", "Repository.URL", "Subject.s.", "Description", "Contact", "Content.type.s.", "Keyword.s.", "Repository.type.s.", "Responsibility", "Date")]
@@ -646,11 +649,7 @@ for(i in 1:109) {
   for(j in link) {
     print(j)
     print(nrow(full_df))
-    tryCatch(expr = {
-      full_df <- rbind(full_df, scrape_re3data(j))
-    }, error = function(error) {
-      NULL
-    })
+    full_df <- rbind(full_df, scrape_re3data(j))
     cat("\014")
   }
 }
