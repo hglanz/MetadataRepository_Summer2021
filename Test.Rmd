@@ -576,10 +576,10 @@ for(i in 1:nrow(mdf)) {
   parse_number() %>%
   sum(na.rm = TRUE)
 }
-mdf$num_authors <- str_split(mdf$Authors, ", ") %>%
-  str_split(" and ") %>%
-  str_split("; ") %>%
-  sapply(length)
+#mdf$num_authors <- str_split(mdf$Authors, ", ") %>%
+#  str_split(" and ") %>%
+#  str_split("; ") %>%
+#  sapply(length)
 for(i in 1:nrow(mdf)) {
   if(mdf[i, "Variables"] == "0") {
     mdf[i, "Variables"] <- as.character(mdf[i, "nnum_vars"] + mdf[i, "nchar_vars"])
@@ -625,15 +625,22 @@ for(i in 1:nrow(mdf)) {
     if(str_detect(mdf[i, "Authors"], ";")) {
       split <- str_split(mdf[i, "Authors"], "; ")
     }else if(str_detect(mdf[i, "Authors"], ",")) {
-      split <- str_split(mdf[i, "Authors"], ", ")
+      if(str_count(",") == 1) {
+        split <- list("Null")
+      }else{
+        split <- str_split(mdf[i, "Authors"], ", ")
+      }
     }else if(str_detect(mdf[i, "Authors"], "and")) {
       split <- str_split(mdf[i, "Authors"], " and ")
     }else{
       split <- list("Null")
     }
     mdf[i, "num_authors"] <- split %>% pluck(1) %>% length()
+  }else{
+    mdf[i, "num_authors"] <- c(NA)
   }
 }
+
 ```
 
 ```{r}
@@ -659,6 +666,12 @@ for(i in 1:109) {
 ```
 
 ```{r}
-
+mdf <- merge_and_drop(mdf, "Name", "Name.of.repository")
+mdf <- merge_and_drop(mdf, "Created", "Date")
+mdf <- merge_and_drop(mdf, "Tags", "Keyword.s.")
+mdf <- merge_and_drop(mdf, "Program.Contact.Name", "Contact")
+mdf <- merge_and_drop(mdf, "Content.type.s.", "Subject")
+mdf <- mdf[names(mdf) != "rowid"]
+mdf <- merge_and_drop(mdf, "Tags", "Keyword")
 ```
 
