@@ -671,7 +671,7 @@ mdf <- merge_and_drop(mdf, "Last.Updated", "Metadata.Updated.Date")
 
 ```{r}
 # Scrape Edinburgh
-url <- "https://datashare.ed.ac.uk/handle/10283/3696"
+url <- "https://datashare.ed.ac.uk/handle/10283/1248"
 cols <- c("Name", scrape_rvest(url, ".word-break h5"))
 stats_url <- paste(url, "/statistics", sep = "")
 df <- data.frame(matrix(ncol = length(cols), nrow = 0))
@@ -702,6 +702,24 @@ for(i in numbers) {
 df$sizeMB <- paste(parse_number(filesize), collapse = "; ")
 df$Author <- checkNull(scrape_rvest(url, ".simple-item-view-creators")) %>%
   str_remove_all("Creator")
-target(df, c("Name", "Author", "Date Available", "Description", "Top Country", "Citation", "Views", "filename", "filesize", "Type"))
+target(df, c("Name", "Author", "Date Available", "Description", "Top Country", "Citation", "Views", "filename", "sizeMB", "Type"))
+```
+
+```{r}
+# Iterate datashare
+#full_df <- data.frame(matrix(ncol = 10, nrow = 0))
+for(i in 3:172) {
+  url <- paste("https://datashare.ed.ac.uk/discover?rpp=20&etal=0&group_by=none&page=", i, sep = "")
+  link <- Frost2021Package::links(url, ".artifact-description :nth-child(1)")
+  link <- link[!is.na(link)]
+  link <- paste("https://datashare.ed.ac.uk", link, sep = "")
+  for(j in link) {
+    print(j)
+    print(nrow(full_df))
+    full_df <- rbind(full_df, scrape_datashare(j))
+    cat("\014")
+  }
+}
+full_df
 ```
 

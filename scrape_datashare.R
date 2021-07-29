@@ -26,7 +26,7 @@ scrape_datashare <- function(url) {
   files <- files[files != "" & !is.na(files)]
   filename <- str_extract(files, "[:print:]+[(]{1}")
   filename <- str_remove_all(filename, "[ (]")
-  filesize <- str_extract(files, "[(][:print:]+[)]")
+  filesize <- str_extract(files, "[(][:alnum:]+[.]{1}[:alnum:]+[:alpha:]+[)]")
   df$filename <- paste(filename, collapse = "; ")
   numbers <- parse_number(filesize)
   count <- 1
@@ -39,5 +39,5 @@ scrape_datashare <- function(url) {
   df$sizeMB <- paste(parse_number(filesize), collapse = "; ")
   df$Author <- checkNull(scrape_rvest(url, ".simple-item-view-creators")) %>%
     str_remove_all("Creator")
-  return(target(df, c("Name", "Author", "Date Available", "Description", "Top Country", "Citation", "Views", "filename", "filesize", "Type")))
+  return(target(df, c("Name", "Author", "Date Available", "Description", "Top Country", "Citation", "Views", "filename", "sizeMB", "Type")))
 }
