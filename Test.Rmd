@@ -455,7 +455,7 @@ Frost2021Package::scrape_figshare("https://figshare.com/articles/journal_contrib
 
 ```{r}
 # Iterate Figshare
-link <- Frost2021Package::links("https://figshare.com/search", ".PzqLM")
+link <- Frost2021Package::links("https://figshare.com/browse", ".WA1B-")
 full_df <- data.frame(matrix(ncol = 8, nrow = 0))
 for(i in link) {
   if(!str_detect(i, "https://")) {
@@ -530,12 +530,6 @@ df
 ```{r}
 mdf <- merge_and_drop(mdf, "Authors", "author")
 mdf <- merge_and_drop(mdf, "Authors", "Author")
-cross <- crossing(var1 = 1:ncol(mdf), var2 = 1:ncol(mdf))
-cross <- mutate(cross, score = map2_dbl(cross$var1, cross$var2, ~similarity_score(.x, .y)))
-cross <- mutate(cross, name1 = names(mdf)[var1], name2 = names(mdf)[var2])
-cross %>%
-  filter(score >= 0.5 & name1 != name2, !is.numeric(names(mdf)[var1]) & !is.numeric(names(mdf)[var2]))
-#map_mdf <- map2_dfr(cross$name1[!is.numeric(cross$name1)] %>% data.frame() %>% distinct() %>% c(), cross$name2[!is.numeric(cross$name2)] %>% data.frame() %>% distinct() %>% c(), ~merge_and_drop(mdf, .x, .y))
 mdf <- merge_and_drop(mdf, "Name", "title")
 mdf <- merge_and_drop(mdf, "Publisher", "publisher")
 mdf <- merge_and_drop(mdf, "file_size", "X.Size.")
@@ -576,15 +570,14 @@ for(i in 1:nrow(mdf)) {
   parse_number() %>%
   sum(na.rm = TRUE)
 }
-#mdf$num_authors <- str_split(mdf$Authors, ", ") %>%
-#  str_split(" and ") %>%
-#  str_split("; ") %>%
-#  sapply(length)
 for(i in 1:nrow(mdf)) {
   if(mdf[i, "Variables"] == "0") {
     mdf[i, "Variables"] <- as.character(mdf[i, "nnum_vars"] + mdf[i, "nchar_vars"])
   }
 }
+```
+
+``` {r}
 split <- str_split(mdf$Authors, ", ") %>%
   str_split(" and ") %>%
   str_split(", ")
@@ -618,7 +611,6 @@ for(i in 1:11944) {
 
 
 ```{r}
-mdf <- read.csv("./Data/mdf.csv")
 mdf <- mdf[names(mdf) != "X.1" & names(mdf) != "rowid"]
 for(i in 1:nrow(mdf)) {
   if(!is.na(mdf[i, "Authors"])) {
@@ -673,5 +665,43 @@ mdf <- merge_and_drop(mdf, "Program.Contact.Name", "Contact")
 mdf <- merge_and_drop(mdf, "Content.type.s.", "Subject")
 mdf <- mdf[names(mdf) != "rowid"]
 mdf <- merge_and_drop(mdf, "Tags", "Keyword")
+mdf <- merge_and_drop(mdf, "Last.Updated", "Metadata.Updated.Date")
+```
+
+
+```{r}
+# Scrape Edinburgh
+url <- "https://datashare.ed.ac.uk/handle/10283/3696"
+cols <- c("Name", scrape_rvest(url, ".word-break h5"))
+stats_url <- paste(url, "/statistics", sep = "")
+df <- data.frame(matrix(ncol = length(cols), nrow = 0))
+data <- scrape_rvest(url, "#aspect_artifactbrowser_ItemViewer_div_item-view .word-break , .first-page-header")
+df <- rbind(df, data)
+names(df) <- cols
+for(i in names(df)) {
+  df[i] <- str_remove_all(df[i], i)
+}
+df$Views <- scrape_rvest(stats_url, "#aspect_statistics_StatisticsTransformer_div_stats > .table-responsive:nth-child(2) .datacell") %>%
+  parse_number() %>%
+  sum()
+df$`Top Country` <- checkNull(scrape_rvest(stats_url, ".table-responsive:nth-child(7) #aspect_statistics_StatisticsTransformer_cell_01"))
+files <- scrape_rvest(url, ".col-sm-8 a")
+files <- files[files != "" & !is.na(files)]
+filename <- str_extract(files, "[:print:]+[(]{1}")
+filename <- str_remove_all(filename, "[ (]")
+filesize <- str_extract(files, "[(][:print:]+[)]")
+df$filename <- paste(filename, collapse = "; ")
+numbers <- parse_number(filesize)
+count <- 1
+for(i in numbers) {
+  if(str_detect(i, "Kb")) {
+    numbers[count] <- numbers[count]/1000
+  }
+  count <- count+1
+}
+df$sizeMB <- paste(parse_number(filesize), collapse = "; ")
+df$Author <- checkNull(scrape_rvest(url, ".simple-item-view-creators")) %>%
+  str_remove_all("Creator")
+target(df, c("Name", "Author", "Date Available", "Description", "Top Country", "Citation", "Views", "filename", "filesize", "Type"))
 ```
 
