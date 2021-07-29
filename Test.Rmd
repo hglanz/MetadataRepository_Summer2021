@@ -669,6 +669,9 @@ mdf <- merge_and_drop(mdf, "file_size", "sizeMB")
 mdf <- merge_and_drop(mdf, "Last.Updated", "date_submitted")
 mdf <- clean(mdf)
 mdf <- mdf[names(mdf) != "X"]
+mdf <- merge_and_drop(mdf, "Views", "Unique.views")
+mdf <- merge_and_drop(mdf, "Downloads", "Unique.downloads")
+mdf <- merge_and_drop(mdf, "Name", "Name.of.repository")
 ```
 
 
