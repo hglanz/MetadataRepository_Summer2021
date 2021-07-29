@@ -339,16 +339,15 @@ for(i in 1:15391) {
 
 ```{r}
 url <- "https://datahub.io/search"
-pg <- read_html(url)
-links <- html_attr(html_nodes(pg, "a"), "href")
-links <- data.frame(links) %>% filter(str_detect(links, "/core/")) %>% distinct()
-full_df <- data.frame(matrix(ncol = 7, nrow = 0))
-for(i in links$links) {
+link <- Frost2021Package::links(url, "a")
+link <- link[str_detect(link, "/core/")]
+link <- link %>% data.frame() %>% distinct()
+link <- link$.
+full_df <- data.frame(matrix(ncol = 8, nrow = 0))
+for(i in link) {
   full_df <- rbind(full_df, scrape_datahub(paste("https://datahub.io", i, sep = "")))
 }
-full_df[, names(full_df) != "rowid"]
-full_df$X.Size. <- parse_number(full_df$X.Size.)
-scrape_datahub("https://datahub.io/core/finance-vix")
+datahub
 ```
 
 ```{r}
@@ -503,15 +502,16 @@ uci <- read.csv("./Data/UCI_metadata.csv")
 zenodo <- read.csv("./Data/zenodo_scraped.csv")
 harvard <- read.csv("./Data/harvard_actual_scraped.csv")
 re3data <- read.csv("./Data/re3data_scraped.csv")
+datashare <- read.csv("./Data/datashare_scraped.csv")
 
 cols <- c("Name", "Published", "Author", "Tags", "Author Affiliation", "Downloads", "Views")
 
 # Merge keywords
 keywords <- c(datagov$Tags, cdph$Tags, corgis$tags, datagov$Topics, harvard$Keyword)
-mdf <- data.frame(matrix(ncol = length(names(cdph))+length(names(corgis))+length(names(datagov))+length(names(datahub))+length(names(uci))+length(names(zenodo))+length(names(harvard))+length(names(re3data)), nrow = 0))
-names(mdf) <- c(names(corgis), names(cdph), names(datagov), names(datahub), names(uci), names(zenodo), names(harvard), names(re3data))
-dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo, harvard, re3data)
-mdf <- rbind(mdf, target(corgis, names(mdf)), target(cdph, names(mdf)), target(datagov, names(mdf)), target(datahub, names(mdf)), target(uci, names(mdf)), target(zenodo, names(mdf)), target(harvard, names(mdf)), target(re3data, names(mdf)))
+mdf <- data.frame(matrix(ncol = length(names(cdph))+length(names(corgis))+length(names(datagov))+length(names(datahub))+length(names(uci))+length(names(zenodo))+length(names(harvard))+length(names(re3data))+length(names(datashare)), nrow = 0))
+names(mdf) <- c(names(corgis), names(cdph), names(datagov), names(datahub), names(uci), names(zenodo), names(harvard), names(re3data), names(datashare))
+dataframes <- c(corgis, cdph, datagov, datahub, uci, zenodo, harvard, re3data, datashare)
+mdf <- rbind(mdf, target(corgis, names(mdf)), target(cdph, names(mdf)), target(datagov, names(mdf)), target(datahub, names(mdf)), target(uci, names(mdf)), target(zenodo, names(mdf)), target(harvard, names(mdf)), target(re3data, names(mdf)), target(datashare, names(mdf)))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
 ```
 
@@ -575,6 +575,7 @@ for(i in 1:nrow(mdf)) {
     mdf[i, "Variables"] <- as.character(mdf[i, "nnum_vars"] + mdf[i, "nchar_vars"])
   }
 }
+cat("\014")
 ```
 
 ``` {r}
@@ -665,7 +666,13 @@ mdf <- merge_and_drop(mdf, "Program.Contact.Name", "Contact")
 mdf <- merge_and_drop(mdf, "Content.type.s.", "Subject")
 mdf <- mdf[names(mdf) != "rowid"]
 mdf <- merge_and_drop(mdf, "Tags", "Keyword")
-mdf <- merge_and_drop(mdf, "Last.Updated", "Metadata.Updated.Date")
+mdf <- merge_and_drop(mdf, "Last.Updated", "Date.Available")
+mdf <- merge_and_drop(mdf, "Description", "description")
+mdf <- merge_and_drop(mdf, "file_size", "sizeMB")
+mdf <- merge_and_drop(mdf, "Last.Updated", "date_submitted")
+mdf <- clean(mdf)
+mdf <- mdf[names(mdf) != "X"]
+datahub
 ```
 
 
@@ -706,8 +713,15 @@ target(df, c("Name", "Author", "Date Available", "Description", "Top Country", "
 ```
 
 ```{r}
+arr <- list(corgis, datahub)
+map(arr, names)
+build_mdf(arr)
+```
+
+
+```{r}
 # Iterate datashare
-#full_df <- data.frame(matrix(ncol = 10, nrow = 0))
+full_df <- read.csv("./Data/datashare_scraped.csv")
 for(i in 3:172) {
   url <- paste("https://datashare.ed.ac.uk/discover?rpp=20&etal=0&group_by=none&page=", i, sep = "")
   link <- Frost2021Package::links(url, ".artifact-description :nth-child(1)")

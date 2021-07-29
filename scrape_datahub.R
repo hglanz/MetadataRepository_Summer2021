@@ -23,6 +23,9 @@ scrape_datahub <- function(url) {
     rowid_to_column() %>%
     filter(rowid > 1)
   data <- data[,2:length(names(data))]
-  write.csv(data, "./Data/scrape_datahub.csv")
-  return(data)
+  name <- paste(scrape_rvest(url, "h1"), collapse = " ")
+  name <- str_remove_all(name, " Certified")
+  name <- paste(name, collapse = ", ")
+  data$Name <- name
+  return(target(data, c("Name", names(data))))
 }
