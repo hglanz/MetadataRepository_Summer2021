@@ -509,6 +509,8 @@ re3data <- read.csv("./Data/re3data_scraped.csv")
 datashare <- read.csv("./Data/datashare_scraped.csv")
 dryad <- read.csv("./Data/datashare_scraped.csv")
 
+datashare$Author <- str_remove_all(string = datashare$Author, pattern = "Data ")
+
 mdf <- build_mdf(list(corgis, cdph, datagov, datahub, uci, zenodo, harvard, re3data, datashare, dryad))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
 ```
@@ -735,5 +737,40 @@ for(i in 3:172) {
   }
 }
 full_df
+```
+
+```{r}
+mdf <- read.csv("./Data/mdf.csv")
+#rdryad::dryad_dataset(dois = c("10.5061/dryad.c866t1g64"))
+
+url <- "https://datahub.io/search"
+link <- Frost2021Package::links(url, "a")
+link <- link[str_detect(link, "/core/")]
+link <- link %>% data.frame() %>% distinct()
+link <- link$.
+link <- paste("https://datahub.io", link, sep = "")
+vec <- c()
+for(i in link) {
+  vec <- append(vec, checkNull(scrape_rvest(i, ".col-xs-2:nth-child(5)")))
+}
+datahub$`X.Updated.` <- vec
+for(i in 1:nrow(datahub)) {
+  if(str_detect(datahub[i, "X.Created."], "days")) {
+    datahub[i, "X.Created."] <- lubridate::now() - days(parse_number(datahub[i, "X.Created."]))
+  }else if(str_detect(datahub[i, "X.Created."], "months")) {
+    datahub[i, "X.Created."] <- lubridate::now() - months(parse_number(datahub[i, "X.Created."]))
+  }else{
+    datahub[i, "X.Created."] <- lubridate::now() - years(parse_number(datahub[i, "X.Created."]))
+  }
+  
+  if(str_detect(datahub[i, "X.Updated."], "days")) {
+    datahub[i, "X.Updated."] <- lubridate::now() - days(parse_number(datahub[i, "X.Updated."]))
+  }else if(str_detect(datahub[i, "X.Updated."], "months")) {
+    datahub[i, "X.Updated."] <- lubridate::now() - months(parse_number(datahub[i, "X.Updated."]))
+  }else{
+    datahub[i, "X.Updated."] <- lubridate::now() - years(parse_number(datahub[i, "X.Updated."]))
+  }
+}
+datahub
 ```
 
