@@ -507,8 +507,9 @@ zenodo <- read.csv("./Data/zenodo_scraped.csv")
 harvard <- read.csv("./Data/harvard_actual_scraped.csv")
 re3data <- read.csv("./Data/re3data_scraped.csv")
 datashare <- read.csv("./Data/datashare_scraped.csv")
+dryad <- read.csv("./Data/datashare_scraped.csv")
 
-mdf <- build_mdf(list(corgis, cdph, datagov, datahub, uci, zenodo, harvard, re3data, datashare))
+mdf <- build_mdf(list(corgis, cdph, datagov, datahub, uci, zenodo, harvard, re3data, datashare, dryad))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
 ```
 
@@ -671,7 +672,7 @@ mdf <- clean(mdf)
 mdf <- mdf[names(mdf) != "X"]
 mdf <- merge_and_drop(mdf, "Views", "Unique.views")
 mdf <- merge_and_drop(mdf, "Downloads", "Unique.downloads")
-mdf <- merge_and_drop(mdf, "Name", "Name.of.repository")
+mdf
 ```
 
 
