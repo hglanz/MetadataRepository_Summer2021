@@ -507,11 +507,11 @@ zenodo <- read.csv("./Data/zenodo_scraped.csv")
 harvard <- read.csv("./Data/harvard_actual_scraped.csv")
 re3data <- read.csv("./Data/re3data_scraped.csv")
 datashare <- read.csv("./Data/datashare_scraped.csv")
-dryad <- read.csv("./Data/datashare_scraped.csv")
+dryad <- read.csv("./Data/dryad_scraped.csv")
 
 datashare$Author <- str_remove_all(string = datashare$Author, pattern = "Data ")
 
-mdf <- build_mdf(list(corgis, cdph, datagov, datahub, uci, zenodo, harvard, re3data, datashare, dryad))
+mdf <- build_mdf(list(corgis, cdph, datagov, datahub, uci, zenodo, harvard, re3data, datashare))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
 ```
 
