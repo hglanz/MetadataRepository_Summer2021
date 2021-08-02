@@ -771,6 +771,8 @@ for(i in 1:nrow(datahub)) {
     datahub[i, "X.Updated."] <- lubridate::now() - years(parse_number(datahub[i, "X.Updated."]))
   }
 }
+datahub$X.Updated. <- date_decimal(parse_number(datahub$X.Updated.))
+datahub$X.Created. <- date_decimal(parse_number(datahub$X.Created.))
 datahub
 ```
 
