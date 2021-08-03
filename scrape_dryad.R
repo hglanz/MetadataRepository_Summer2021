@@ -74,12 +74,16 @@ scrape_dryad <- function(url) {
     df$sizeMB <- paste(file_info$sizeMB, collapse = "; ")
     df$filename <- paste(file_info$filename, collapse = "; ")
   }
-  df$Abstract <- checkNull(scrape_rvest(url, ".t-landing__text-wall"))
+  df$Abstract <- checkNull(scrape_rvest(url, ".t-landing__text-wall"))[1]
   targets <- c("Name", "Citation", "Abstract", "Methods", "filename", "sizeMB", "Authors", "AuthorAffiliation", "Date", "Publication Date")
   doi <- str_split(url, "doi:") %>% pluck(1)
   doi <- doi[2]
-  doi_df <- dryad_dataset(doi) %>%
-    data.frame()
-  df$`Publication Date` <- doi_df$`X10.5061.dryad.tqjq2bvxm.publicationDate`
+  tryCatch(expr = {
+    doi_df <- dryad_dataset(doi) %>%
+      data.frame()
+    df$`Publication Date` <- doi_df$`X10.5061.dryad.tqjq2bvxm.publicationDate`
+  }, error = function(error) {
+    df$`Publication Date` <- c(NA)
+  })
   return(target(df, targets))
 }
