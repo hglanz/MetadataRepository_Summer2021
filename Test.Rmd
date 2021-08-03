@@ -32,7 +32,7 @@ scrape_rvest(url, ".dataset-header-v2__title")
 ```
 
 ```{r}
-url <- "https://datadryad.org/stash/dataset/doi:10.5061/dryad.mkkwh70xh"
+url <- "https://datadryad.org/stash/dataset/doi:10.5061/dryad.18931zcss"
   cols <- scrape_rvest(url, ".c-sidebox__heading , .o-heading__level2")
   data <- scrape_rvest(url, ".c-locations__data , .o-heading__level2+ p , .t-landing__text-wall p , #show_license p , .o-metrics__metric , .c-file-group , .c-file-group__summary")
   df <- data.frame(matrix(ncol = length(cols), nrow = 0))
@@ -99,13 +99,17 @@ if(!is.na(file_info)) {
   df$sizeMB <- paste(file_info$sizeMB, collapse = "; ")
   df$filename <- paste(file_info$filename, collapse = "; ")
 }
-df$Abstract <- checkNull(scrape_rvest(url, ".t-landing__text-wall"))
+df$Abstract <- checkNull(scrape_rvest(url, ".t-landing__text-wall"))[1]
 targets <- c("Name", "Citation", "Abstract", "Methods", "filename", "sizeMB", "Authors", "AuthorAffiliation", "Date", "Publication Date")
 doi <- str_split(url, "doi:") %>% pluck(1)
 doi <- doi[2]
-doi_df <- dryad_dataset(doi) %>%
+tryCatch(expr = {
+  doi_df <- dryad_dataset(doi) %>%
   data.frame()
-df$`Publication Date` <- doi_df$`X10.5061.dryad.tqjq2bvxm.publicationDate`
+  df$`Publication Date` <- doi_df$`X10.5061.dryad.tqjq2bvxm.publicationDate`
+}, error = function(error) {
+  df$`Publication Date` <- c(NA)
+})
 target(df, targets)
 ```
 
@@ -121,9 +125,8 @@ authors[1]
 
 ```{r}
 # Iterate dryad
-full_df <- data.frame(matrix(ncol = 5, nrow = 0))
-count <- 0
-for(i in 1:41864) {
+#full_df <- data.frame(matrix(ncol = 10, nrow = 0))
+for(i in 485:41864) {
   url <- paste("https://datadryad.org/search?page=", i, "&q=", sep = "")
   pg <- read_html(url)
   links <- html_attr(html_nodes(pg, "#documents a"), "href")
@@ -133,10 +136,15 @@ for(i in 1:41864) {
   for(j in links) {
     print(j)
     print(nrow(full_df))
-    full_df <- rbind(df, scrape_dryad(j))
+    tryCatch(expr = {
+      full_df <- rbind(full_df, scrape_dryad(j))
+    }, error = function(err) {
+      NULL
+    })
     cat("\014")
   }
 }
+full_df
 ```
 
 
