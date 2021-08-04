@@ -790,3 +790,38 @@ datahub$X.Created. <- date_decimal(parse_number(datahub$X.Created.))
 datahub
 ```
 
+
+```{r}
+mdf <- read.csv("./Data/mdf.csv")
+dryad$has_API <- TRUE
+datahub$has_API <- TRUE
+harvard$has_API <- TRUE
+corgis$has_API <- FALSE
+uci$has_API <- FALSE
+re3data$has_API <- TRUE
+zenodo$has_API <- TRUE
+datashare$has_API <- FALSE
+datagov$has_API <- TRUE
+cdph$has_API <- TRUE
+
+api <- c(dryad$has_API, datahub$has_API, harvard$has_API, corgis$has_API, uci$has_API, re3data$has_API, zenodo$has_API, datashare$has_API, cdph$has_API, datagov$has_API)
+mdf$has_API <- api
+
+vec <- c()
+str <- str_split(mdf$FileName, ", ")
+for(i in 1:nrow(mdf)) {
+  if(!is.na(mdf[i, "FileName"])) {
+    vec <- append(vec, str %>% pluck(i) %>% length())
+  }else{
+    vec <- append(vec, NA)
+  }
+}
+mdf$num_files <- vec
+mean(mdf$num_files, na.rm = TRUE)
+mdf <- merge_and_drop(mdf, "num_files", "X.Files.")
+mdf <- mdf[names(mdf) != "X"]
+mdf %>%
+  filter(str_detect(FileName, "json"))
+View(mdf)
+```
+
