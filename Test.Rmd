@@ -524,7 +524,7 @@ dryad <- read.csv("./Data/dryad_scraped.csv")
 
 datashare$Author <- str_remove_all(string = datashare$Author, pattern = "Data ")
 
-mdf <- build_mdf(list(corgis, cdph, datagov, datahub, uci, zenodo, harvard, re3data, datashare))
+mdf <- build_mdf(list(corgis, cdph, datagov, datahub, uci, zenodo, harvard, re3data, datashare, dryad))
 mdf <- mdf[!str_detect(names(mdf), ".[:digit:]{1}")]
 ```
 
