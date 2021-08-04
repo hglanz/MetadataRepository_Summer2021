@@ -687,7 +687,8 @@ mdf <- clean(mdf)
 mdf <- mdf[names(mdf) != "X"]
 mdf <- merge_and_drop(mdf, "Views", "Unique.views")
 mdf <- merge_and_drop(mdf, "Downloads", "Unique.downloads")
-mdf
+mdf <- merge_and_drop(mdf, "FileName", "filename")
+mdf$Tags <- str_remove_all(mdf$Tags, "\"")
 ```
 
 
