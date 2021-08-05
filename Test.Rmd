@@ -825,6 +825,5 @@ mdf %>%
 View(mdf)
 
 mdf$ntags <- map_int(mdf$Tags, ~str_split(.x, ",") %>% pluck(1) %>% length())
-
 ```
 
