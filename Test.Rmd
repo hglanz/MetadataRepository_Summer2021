@@ -852,6 +852,13 @@ delimiter <- function(x) {
         string <- paste(string, "pipe", sep = "; ")
       }
     }
+    if(str_detect(x, "pdf") | str_detect(x, "tsv")) {
+      if(length(string) == 0) {
+        string <- paste(string, "\\t", sep = "")
+      }else{
+        string <- paste(string, "\\t", sep = "; ")
+      }
+    }
     return(string)
   }
   return(NA)
