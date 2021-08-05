@@ -823,5 +823,8 @@ mdf <- mdf[names(mdf) != "X"]
 mdf %>%
   filter(str_detect(FileName, "json"))
 View(mdf)
+
+mdf$ntags <- map_int(mdf$Tags, ~str_split(.x, ",") %>% pluck(1) %>% length())
+
 ```
 
