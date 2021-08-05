@@ -827,3 +827,43 @@ View(mdf)
 mdf$ntags <- map_int(mdf$Tags, ~str_split(.x, ",") %>% pluck(1) %>% length())
 ```
 
+```{r}
+delimiter <- function(x) {
+  string <- ""
+  if(!is.na(x)) {
+    if(str_detect(x, "csv")) {
+      if(length(string) == 0) {
+        string <- paste(string, ",", sep = "")
+      }else{
+        string <- paste(string, ",", sep = "; ")
+      }
+    }
+    if(str_detect(x, "json")) {
+      if(length(string) == 0) {
+        string <- paste(string, "\\n", sep = "")
+      }else{
+        string <- paste(string, "\\n", sep = "; ")
+      }
+    }
+    if(str_detect(x, "zip")) {
+      if(length(string) == 0) {
+        string <- paste(string, "pipe", sep = "")
+      }else{
+        string <- paste(string, "pipe", sep = "; ")
+      }
+    }
+    return(string)
+  }
+  return(NA)
+}
+
+delim <- map_chr(mdf$FileName, delimiter)
+mdf$delim.1 <- delim
+mdf %>%
+  select(FileName, delimiter, delim.1) %>%
+  filter(!is.na(FileName), !is.na(delim.1))
+mdf <- merge_and_drop(mdf, "delimiter", "delim.1")
+mdf <- mdf[names(mdf) != "X" & names(mdf) != "X.1"]
+View(mdf)
+```
+
