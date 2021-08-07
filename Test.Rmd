@@ -871,6 +871,61 @@ mdf %>%
   filter(!is.na(FileName), !is.na(delim.1))
 mdf <- merge_and_drop(mdf, "delimiter", "delim.1")
 mdf <- mdf[names(mdf) != "X" & names(mdf) != "X.1"]
-View(mdf)
+```
+
+```{r}
+url <- "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MRZGNQ"
+mdf <- read.csv("./Data/mdf.csv")
+scrape_harvard("https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/KF1LAK")
+
+
+scrape_rvest(url, ".fileNameOriginal a") %>%
+  paste(collapse = ", ")
+scrape_rvest(url, ".visible-lg-inline") %>%
+  parse_number() %>%
+  paste(collapse = ", ")
+scrape_rvest(url, "#datasetForm\:tabView\:filesTable\:1\:fileSize , #datasetForm\:tabView\:filesTable\:0\:fileSize") %>%
+  parse_number()
+scrape_rvest(url, "#datasetForm\\:tabView\\:filesTable\\:0\\:fileSize") %>%
+  substr(3, str_length(.))
+nfiles <- scrape_rvest("https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/MRZGNQ", ".highlightBold")
+nfiles <- nfiles[str_detect(nfiles, "of") & str_detect(nfiles, "Files")]
+nfiles <- str_remove_all(nfiles, "[:Alpha:]") %>%
+  str_trim()
+nfiles <- strsplit(nfiles, " +")[[1]][3] %>%
+  parse_number()
+
+filename <- c()
+downloads <- c()
+fileSize <- c()
+count <- 0
+for(i in 1:11986) {
+  if(count == nrow(harvard)) {
+    break
+  }
+  url <- paste("https://dataverse.harvard.edu/dataverse/harvard?q=&types=dataverses%3Adatasets&sort=dateSort&order=desc&page=", i, sep = "")
+  links <- Frost2021Package::links(url, ".card-title-icon-block a")
+  links <- paste("https://dataverse.harvard.edu", links, sep = "")
+  links <- links[str_detect(links, "/dataset")]
+  for(j in links) {
+    print(count)
+    print(j)
+    nfiles <- scrape_rvest(j, ".highlightBold")
+  nfiles <- nfiles[str_detect(nfiles, "of") & str_detect(nfiles, "Files")]
+  nfiles <- str_remove_all(nfiles, "[:Alpha:]") %>%
+    str_trim()
+  nfiles <- strsplit(nfiles, " +")[[1]][3] %>%
+    parse_number()
+    for(k in 0:nfiles-1) {
+      fileSize <- append(fileSize, scrape_rvest(j, paste("#datasetForm\\:tabView\\:filesTable\\:", k, "\\:fileSize", sep = "")) %>% substr(3, length(.)) %>% convert())
+    }
+    count <- count+1
+  }
+}
+```
+
+
+```{r}
+mdf <- read.csv("./Data/mdf.csv")
 ```
 
