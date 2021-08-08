@@ -126,7 +126,7 @@ authors[1]
 ```{r}
 # Iterate dryad
 #full_df <- data.frame(matrix(ncol = 10, nrow = 0))
-for(i in 485:41864) {
+for(i in 1:41864) {
   url <- paste("https://datadryad.org/search?page=", i, "&q=", sep = "")
   pg <- read_html(url)
   links <- html_attr(html_nodes(pg, "#documents a"), "href")
@@ -927,5 +927,6 @@ for(i in 1:11986) {
 
 ```{r}
 mdf <- read.csv("./Data/mdf.csv")
+mdf
 ```
 
