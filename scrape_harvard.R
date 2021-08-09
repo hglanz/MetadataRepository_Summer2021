@@ -60,6 +60,10 @@ scrape_harvard <- function(url) {
   df$Name <- checkNull(name)
   df$`Deposit Date` <- checkNull(scrape_rvest(url, "#metadata_dateOfDeposit td"))
   df$Citation <- checkNull(scrape_rvest(url, ".citation-select"))
+  fn <- scrape_rvest(url, ".fileNameOriginal a")
+  fn <- fn[fn != ""]
+  nfiles <- length(fn)
+  df$FileName <- fn %>% paste(cpllapse = ", ") %>% checkNull()
   target <- c("Name", "Description", "Subject", "Keyword", "Deposit Date", "Author", "Depositor", "Citation", "FileName", "Downloads", "Variables", "Observations")
   df$Depositor <- checkNull(scrape_rvest(url, "#metadata_depositor td"))
   for(i in target) {
