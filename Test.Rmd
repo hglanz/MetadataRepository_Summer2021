@@ -149,7 +149,7 @@ full_df
 
 
 ```{r}
-url <- "https://dataverse.harvard.edu/dataverse/gemilang;jsessionid=a20dacca3200c53eeb823f127187"
+url <- "https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/1Y0Z06"
 name <- scrape_rvest(url, "#title")
   cols <- scrape_rvest(url, "#metrics-heading , th")
   data <- scrape_rvest(url, ".metrics-count-block , td")
@@ -202,19 +202,64 @@ name <- scrape_rvest(url, "#title")
   df$Name <- checkNull(name)
   df$`Deposit Date` <- checkNull(scrape_rvest(url, "#metadata_dateOfDeposit td"))
   df$Citation <- checkNull(scrape_rvest(url, ".citation-select"))
-  target <- c("Name", "Description", "Subject", "Keyword", "Deposit Date", "Author", "Depositor", "Citation", "FileName", "Downloads", "Variables", "Observations")
+  fn <- c()
+  sz <- c()
+  tryCatch(expr = {
+    nfiles <- scrape_rvest(url, ".highlightBold")
+    nfiles <- nfiles[str_detect(nfiles, "File")]
+    nfiles <- str_remove_all(nfiles, "[:Alpha:]") %>%
+      str_trim()
+    split <- nfiles %>%
+      strsplit(" +") %>%
+      pluck(1) %>%
+      length()
+    if(split != 1) {
+      nfiles <- strsplit(nfiles, " +")[[1]][3] %>%
+      parse_number()
+    }else{
+      nfiles <- parse_number(nfiles)
+    }
+    if(nfiles == 1) {
+      nfiles <- 2
+    }
+  }, error = function(error) {
+    nfiles <- 2
+  })
+  seq <- c(0:nfiles-1)
+  seq <- seq[seq >= 0]
+  for(i in seq) {
+    name <- scrape_rvest(url, paste("#datasetForm\\:tabView\\:filesTable\\:", i, "\\:fileInfoInclude-filesTable a", sep = ""))
+    size <- scrape_rvest(url, paste("#datasetForm\\:tabView\\:filesTable\\:", i, "\\:fileSize", sep = ""))
+    size <- checkNull(size)
+    if(!is.na(size)) {
+      size <- substr(size, 3, str_length(size)) %>% convert()
+    }
+    fn <- append(fn, name)
+    if(!is.na(size)) {
+      sz <- append(sz, as.character(size))
+    }else{
+      sz <- append(sz, size)
+    }
+  }
+  df$FileName <- paste(fn, collapse = ", ")
+  df$sizeMB <- paste(sz, collapse = ", ")
+  target <- c("Name", "Description", "Subject", "Keyword", "Deposit Date", "Author", "Depositor", "Citation", "FileName", "sizeMB", "Downloads", "Variables", "Observations")
   df$Depositor <- checkNull(scrape_rvest(url, "#metadata_depositor td"))
   for(i in target) {
     if(!(i %in% names(df))) {
       df[i] <- c(NA)
     }
   }
-  df[target]
+  df[target]$sizeMB %>%
+    strsplit(", ") %>%
+    pluck(1) %>%
+    parse_double() %>%
+    sum(na.rm = TRUE)
 ```
 
 ```{r}
-full_df <- data.frame(matrix(ncol = 12, nrow = 0))
-for(i in 36:11944) {
+full_df <- data.frame(matrix(ncol = 13, nrow = 0))
+for(i in 1:11944) {
   url <- paste("https://dataverse.harvard.edu/dataverse/harvard?q=&types=dataverses%3Adatasets&sort=dateSort&order=desc&page=", i, sep = "")
   links <- Frost2021Package::links(url, ".card-title-icon-block a")
   links <- paste("https://dataverse.harvard.edu", links, sep = "")
@@ -927,6 +972,59 @@ for(i in 1:11986) {
 
 ```{r}
 mdf <- read.csv("./Data/mdf.csv")
-mdf
+mdf %>%
+  filter(!is.na(delimiter))
+mdf <- mdf[names(mdf) != "Program.Contact.Email"]
+for(i in 1:nrow(mdf)) {
+  if(is.na(mdf[i, "FileName"])) {
+    mdf[i, "file_size"] <- NA
+  }
+}
+
+types <- c("csv", "json", "xls", "pdf", "zip", "tsv", "jpg", "jpeg", "png", "pdf", "txt")
+for(i in 1:nrow(mdf)) {
+  type <- ""
+  for(j in types) {
+    if(!is.na(mdf[i, "FileName"])) {
+      if(str_detect(mdf[i, "FileName"], j)) {
+        if(!is.na(mdf[i, "extension"])) {
+          if(str_length(mdf[i, "extension"]) == 0) {
+            if(str_length(type) == 0) {
+              type <- str_c(type, j, sep = "")
+            }else{
+              type <- str_c(type, j, sep = ", ")
+            }
+          }
+        }else{
+          if(str_length(type) == 0) {
+            type <- str_c(type, j, sep = "")
+          }else{
+            type <- str_c(type, j, sep = ", ")
+          }
+        }
+      }
+    }else{
+      type <- NA
+      break
+    }
+  }
+  mdf[i, "extension"] <- type
+}
+mdf[1:47, "extension"] <- "csv"
+mdf[c("Last.Updated", "Created")] %>%
+  filter(!is.na(Last.Updated) & !is.na(Created))
+for(i in 1:nrow(mdf)) {
+  tryCatch(expr = {
+    mdf[i, "Last.Updated"] <- mdy(mdf[i, "Last.Updated"])
+  }, error = function(error) {
+    split <- str_split(mdf$Last.Updated, ", ")
+    for(j in 1:length(split)) {
+      if(length(list[[j]]) > 1) {
+        date <- paste(list[[j]][1], list[[j]][2], collapse = ", ")
+        mdf[j, "Last.Updated"] <- mdy(date)
+      }
+    }
+  })
+}
 ```
 
