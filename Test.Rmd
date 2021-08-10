@@ -16,6 +16,7 @@ library(bestpredictor)
 library(lubridate)
 library(DT)
 library(rdryad)
+library(plotly)
 ```
 
 ```{r}
@@ -1038,5 +1039,7 @@ for(i in 1:nrow(mdf)) {
     vec <- append(vec, mdf[i, "Created"] %>% mdy())
   }
 }
-mdf$Created <- vec
+mdf$rel_age <- mdf$Last.Updated - mdf$Created
+mdf$rel_age <- parse_number(as.character(mdf$rel_age))
+ggplotly(ggplot(mdf) + geom_histogram(aes(x=rel_age)))
 ```
