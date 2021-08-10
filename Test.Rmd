@@ -973,7 +973,7 @@ for(i in 1:11986) {
 ```{r}
 mdf <- read.csv("./Data/mdf.csv")
 mdf %>%
-  filter(!is.na(delimiter))
+  filter(extension == "csv zip")
 mdf <- mdf[names(mdf) != "Program.Contact.Email"]
 for(i in 1:nrow(mdf)) {
   if(is.na(mdf[i, "FileName"])) {
@@ -1026,5 +1026,18 @@ for(i in 1:nrow(mdf)) {
     }
   })
 }
-```
 
+for(i in 1:nrow(mdf)) {
+  if(!is.na(mdf[i, "Last.Updated"])) {
+    tryCatch(expr = {
+      mdf[i, "Last.Updated"] <- mdy(mdf[i, "Last.Updated"])
+    }, warning = function(warning) {
+      split <- str_split(mdf[i, "Last.Updated"], ", ") %>% pluck(1)
+      split <- split[1:3]
+      mdf[i, "Last.Updated"] <- split[1:2] %>% paste(collapse = " ") %>% mdy()
+    })
+  }
+}
+mdf["Last.Updated"]
+POSIXct(mdf$Last.Updated)
+```
