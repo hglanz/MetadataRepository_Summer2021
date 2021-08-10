@@ -984,9 +984,8 @@ for(i in 1:nrow(mdf)) {
   }
   mdf[i, "Created"] <- split
 }
-mdf["Last.Updated"]
 mdf %>%
-  filter(extension == "csv zip")
+  select(Last.Updated, Created)
 mdf <- mdf[names(mdf) != "Program.Contact.Email"]
 for(i in 1:nrow(mdf)) {
   if(is.na(mdf[i, "FileName"])) {
@@ -1026,40 +1025,18 @@ for(i in 1:nrow(mdf)) {
 mdf[1:47, "extension"] <- "csv"
 mdf[c("Last.Updated", "Created")] %>%
   filter(!is.na(Last.Updated) & !is.na(Created))
+vec <- c()
 for(i in 1:nrow(mdf)) {
-  tryCatch(expr = {
-    mdf[i, "Last.Updated"] <- mdy(mdf[i, "Last.Updated"])
-  }, error = function(error) {
-    split <- str_split(mdf$Last.Updated, ", ")
-    for(j in 1:length(split)) {
-      if(length(list[[j]]) > 1) {
-        date <- paste(list[[j]][1], list[[j]][2], collapse = ", ")
-        mdf[j, "Last.Updated"] <- mdy(date)
-      }
-    }
-  })
+  vec <- append(vec, mdf[i, "Last.Updated"] %>% mdy())
 }
-
+mdf$Last.Updated <- vec
+vec <- c()
 for(i in 1:nrow(mdf)) {
-  if(!is.na(mdf[i, "Last.Updated"])) {
-    tryCatch(expr = {
-      mdf[i, "Last.Updated"] <- mdy(mdf[i, "Last.Updated"])
-    }, warning = function(warning) {
-      split <- str_split(mdf[i, "Last.Updated"], ", ") %>% pluck(1)
-      split <- split[1:3]
-      mdf[i, "Last.Updated"] <- split[1:2] %>% paste(collapse = " ") %>% mdy()
-    })
-  }
-  if(!is.na(mdf[i, "Created"])) {
-    tryCatch(expr = {
-      mdf[i, "Created"] <- mdy(mdf[i, "Created"])
-    }, warning = function(warning) {
-      split <- str_split(mdf[i, "Created"], ", ") %>% pluck(1)
-      split <- split[1:3]
-      mdf[i, "Created"] <- split[1:2] %>% paste(collapse = " ") %>% mdy()
-    })
+  if(is.na(mdf[i, "Created"])) {
+    vec <- append(vec, mdf[i, "Last.Updated"])
+  }else{
+    vec <- append(vec, mdf[i, "Created"] %>% mdy())
   }
 }
-mdf["Last.Updated"]
-POSIXct(mdf$Last.Updated)
+mdf$Created <- vec
 ```
