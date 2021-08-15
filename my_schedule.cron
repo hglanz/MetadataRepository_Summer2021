@@ -1,0 +1,13 @@
+## cronR job
+## id:   job_b5b4005b5e960bb14b5831c235cf676b
+## tags: Zenodo Scraping
+## desc: New things in Zenodo
+0-59 * * * * /Library/Frameworks/R.framework/Resources/bin/Rscript '/Users/sucheen/Documents/Cal Poly SLO/Academics/Summer 2021/MetadataRepository_Summer2021/iterate_zenodo.R'  >> '/Users/sucheen/Documents/Cal Poly SLO/Academics/Summer 2021/MetadataRepository_Summer2021/iterate_zenodo.log' 2>&1
+
+## cronR job
+## id:   job_aa3c16ea3b118475ff8e0c3c1ed47bb0
+## tags: 
+## desc: I execute things
+0-59 * * * * /Library/Frameworks/R.framework/Resources/bin/Rscript '/Users/sucheen/Documents/Cal Poly SLO/Academics/Summer 2021/MetadataRepository_Summer2021/iterate_zenodo.R'  >> '/Users/sucheen/Documents/Cal Poly SLO/Academics/Summer 2021/MetadataRepository_Summer2021/iterate_zenodo.log' 2>&1
+
+ 
