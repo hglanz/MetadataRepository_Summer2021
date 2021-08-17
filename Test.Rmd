@@ -1048,6 +1048,7 @@ ggplotly(ggplot(mdf) + geom_histogram(aes(x=rel_age)))
 
 ```{r}
 mdf <- read.csv("./Data/mdf.csv")
-curate("zenodo", 1)
+unique_na(mdf, "Name")
+curate("zenodo", 10)
 ```
 
