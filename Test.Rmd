@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(include = FALSE)
+knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(rvest)
 library(Frost2021Package)
@@ -1046,6 +1046,8 @@ ggplotly(ggplot(mdf) + geom_histogram(aes(x=rel_age)))
 ```
 
 ```{r}
-curate("zenodo", 5)
+mdf <- read.csv("./Data/mdf.csv")
+mdf %>%
+  distinct(Name, .keep_all = TRUE)
 ```
 
