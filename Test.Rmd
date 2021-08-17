@@ -18,6 +18,7 @@ library(DT)
 library(rdryad)
 library(plotly)
 library(cronR)
+library(devtools)
 ```
 
 ```{r}
@@ -1047,7 +1048,7 @@ ggplotly(ggplot(mdf) + geom_histogram(aes(x=rel_age)))
 
 ```{r}
 mdf <- read.csv("./Data/mdf.csv")
-mdf %>%
-  distinct(Name, .keep_all = TRUE)
+curate("zenodo", 1)
+
 ```
 
