@@ -1049,6 +1049,10 @@ ggplotly(ggplot(mdf) + geom_histogram(aes(x=rel_age)))
 ```{r}
 mdf <- read.csv("./Data/mdf.csv")
 unique_na(mdf, "Name")
-curate("zenodo", 10)
+curate("harvard", 10, write = TRUE)
+mdf$Last.Updated <- mdf$Last.Updated %>%
+  parse_date()
+mdf$Created <- parse_date(mdf$Created)
+select(mdf, Created, Last.Updated)
 ```
 
