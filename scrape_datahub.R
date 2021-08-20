@@ -26,6 +26,7 @@ scrape_datahub <- function(url) {
   name <- paste(scrape_rvest(url, "h1"), collapse = " ")
   name <- str_remove_all(name, " Certified")
   name <- paste(name, collapse = ", ")
+  name <- str_trim(name)
   data$Name <- name
   return(target(data, c("Name", names(data))))
 }
