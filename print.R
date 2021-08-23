@@ -1,1 +1,2 @@
-print("Success")
+library(lubridate)
+print(now())
