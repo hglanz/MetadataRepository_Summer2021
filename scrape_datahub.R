@@ -22,11 +22,12 @@ scrape_datahub <- function(url) {
     rbind(data) %>%
     rowid_to_column() %>%
     filter(rowid > 1)
-  data <- data[,2:length(names(data))]
+  data <- target(data, c("Name", "X.Files.", "X.Size.", "X.Format.", "X.Created.", "X.Updated.", "X.Licence."))
+  data$X.Size. <- toupper(data$X.Size.) %>% convert() %>% checkNull()
   name <- paste(scrape_rvest(url, "h1"), collapse = " ")
   name <- str_remove_all(name, " Certified")
   name <- paste(name, collapse = ", ")
   name <- str_trim(name)
-  data$Name <- name
-  return(target(data, c("Name", names(data))))
+  data$Name <- checkNull(name)
+  return(data)
 }
