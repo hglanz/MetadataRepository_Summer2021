@@ -1,0 +1,252 @@
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✓ ggplot2 3.3.3     ✓ purrr   0.3.4
+✓ tibble  3.1.2     ✓ dplyr   1.0.6
+✓ tidyr   1.1.3     ✓ stringr 1.4.0
+✓ readr   1.4.0     ✓ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+x dplyr::filter() masks stats::filter()
+x dplyr::lag()    masks stats::lag()
+
+Attaching package: ‘rvest’
+
+The following object is masked from ‘package:readr’:
+
+    guess_encoding
+
+
+Attaching package: ‘Frost2021Package’
+
+The following object is masked from ‘package:base’:
+
+    get
+
+Warning message:
+replacing previous import ‘magrittr::set_names’ by ‘purrr::set_names’ when loading ‘Frost2021Package’ 
+
+Attaching package: ‘bestpredictor’
+
+The following object is masked from ‘package:Frost2021Package’:
+
+    predictors
+
+Warning message:
+replacing previous import ‘magrittr::set_names’ by ‘purrr::set_names’ when loading ‘bestpredictor’ 
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+Registered S3 method overwritten by 'hoardr':
+  method           from
+  print.cache_info httr
+
+Attaching package: ‘plotly’
+
+The following object is masked from ‘package:ggplot2’:
+
+    last_plot
+
+The following object is masked from ‘package:stats’:
+
+    filter
+
+The following object is masked from ‘package:graphics’:
+
+    layout
+
+Loading required package: usethis
+Error in `[<-.data.frame`(`*tmp*`, i, value = NA) : 
+  replacement has 1 row, data has 0
+Calls: curate -> rbind -> rbind -> target -> [<- -> [<-.data.frame
+Execution halted
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✓ ggplot2 3.3.3     ✓ purrr   0.3.4
+✓ tibble  3.1.2     ✓ dplyr   1.0.6
+✓ tidyr   1.1.3     ✓ stringr 1.4.0
+✓ readr   1.4.0     ✓ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+x dplyr::filter() masks stats::filter()
+x dplyr::lag()    masks stats::lag()
+
+Attaching package: ‘rvest’
+
+The following object is masked from ‘package:readr’:
+
+    guess_encoding
+
+
+Attaching package: ‘Frost2021Package’
+
+The following object is masked from ‘package:base’:
+
+    get
+
+Warning message:
+replacing previous import ‘magrittr::set_names’ by ‘purrr::set_names’ when loading ‘Frost2021Package’ 
+
+Attaching package: ‘bestpredictor’
+
+The following object is masked from ‘package:Frost2021Package’:
+
+    predictors
+
+Warning message:
+replacing previous import ‘magrittr::set_names’ by ‘purrr::set_names’ when loading ‘bestpredictor’ 
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+Registered S3 method overwritten by 'hoardr':
+  method           from
+  print.cache_info httr
+
+Attaching package: ‘plotly’
+
+The following object is masked from ‘package:ggplot2’:
+
+    last_plot
+
+The following object is masked from ‘package:stats’:
+
+    filter
+
+The following object is masked from ‘package:graphics’:
+
+    layout
+
+Loading required package: usethis
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✓ ggplot2 3.3.3     ✓ purrr   0.3.4
+✓ tibble  3.1.2     ✓ dplyr   1.0.6
+✓ tidyr   1.1.3     ✓ stringr 1.4.0
+✓ readr   1.4.0     ✓ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+x dplyr::filter() masks stats::filter()
+x dplyr::lag()    masks stats::lag()
+
+Attaching package: ‘rvest’
+
+The following object is masked from ‘package:readr’:
+
+    guess_encoding
+
+
+Attaching package: ‘Frost2021Package’
+
+The following object is masked from ‘package:base’:
+
+    get
+
+Warning message:
+replacing previous import ‘magrittr::set_names’ by ‘purrr::set_names’ when loading ‘Frost2021Package’ 
+
+Attaching package: ‘bestpredictor’
+
+The following object is masked from ‘package:Frost2021Package’:
+
+    predictors
+
+Warning message:
+replacing previous import ‘magrittr::set_names’ by ‘purrr::set_names’ when loading ‘bestpredictor’ 
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+Registered S3 method overwritten by 'hoardr':
+  method           from
+  print.cache_info httr
+
+Attaching package: ‘plotly’
+
+The following object is masked from ‘package:ggplot2’:
+
+    last_plot
+
+The following object is masked from ‘package:stats’:
+
+    filter
+
+The following object is masked from ‘package:graphics’:
+
+    layout
+
+Loading required package: usethis
+Error in `[<-.data.frame`(`*tmp*`, i, value = NA) : 
+  replacement has 1 row, data has 0
+Calls: curate -> rbind -> rbind -> target -> [<- -> [<-.data.frame
+Execution halted
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✓ ggplot2 3.3.3     ✓ purrr   0.3.4
+✓ tibble  3.1.2     ✓ dplyr   1.0.6
+✓ tidyr   1.1.3     ✓ stringr 1.4.0
+✓ readr   1.4.0     ✓ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+x dplyr::filter() masks stats::filter()
+x dplyr::lag()    masks stats::lag()
+
+Attaching package: ‘rvest’
+
+The following object is masked from ‘package:readr’:
+
+    guess_encoding
+
+
+Attaching package: ‘Frost2021Package’
+
+The following object is masked from ‘package:base’:
+
+    get
+
+Warning message:
+replacing previous import ‘magrittr::set_names’ by ‘purrr::set_names’ when loading ‘Frost2021Package’ 
+
+Attaching package: ‘bestpredictor’
+
+The following object is masked from ‘package:Frost2021Package’:
+
+    predictors
+
+Warning message:
+replacing previous import ‘magrittr::set_names’ by ‘purrr::set_names’ when loading ‘bestpredictor’ 
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:base’:
+
+    date, intersect, setdiff, union
+
+Registered S3 method overwritten by 'hoardr':
+  method           from
+  print.cache_info httr
+
+Attaching package: ‘plotly’
+
+The following object is masked from ‘package:ggplot2’:
+
+    last_plot
+
+The following object is masked from ‘package:stats’:
+
+    filter
+
+The following object is masked from ‘package:graphics’:
+
+    layout
+
+Loading required package: usethis
+Error in `[<-.data.frame`(`*tmp*`, i, value = NA) : 
+  replacement has 1 row, data has 0
+Calls: curate -> rbind -> rbind -> target -> [<- -> [<-.data.frame
+Execution halted
+Error in `[<-.data.frame`(`*tmp*`, i, value = NA) : 
+  replacement has 1 row, data has 0
+Calls: curate -> rbind -> rbind -> target -> [<- -> [<-.data.frame
+Execution halted
