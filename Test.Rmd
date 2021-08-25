@@ -1266,5 +1266,5 @@ path <- "./Data/mdf.csv"
     write.csv(binded, path)
     git(repository = "MetadataRepository_Summer2021", message = paste("mdf.csv updated", now() %>% as.character(), "PT"))
   }
-binded
+curate("re3data", 1)
 ```
