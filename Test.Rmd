@@ -1079,5 +1079,7 @@ curate("datahub", write = TRUE)
 cron_ls()
 vec_eq(mdf$X.1, c(1:nrow(mdf)))
 vec_eq(col_to_vec(mdf["X.2"]), c(1:nrow(mdf)))
+mdf <- drop_rowid(mdf)
+mdf <- mdf[names(mdf) != "X"]
 
 ```
