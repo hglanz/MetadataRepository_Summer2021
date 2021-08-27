@@ -1081,5 +1081,18 @@ vec_eq(mdf$X.1, c(1:nrow(mdf)))
 vec_eq(col_to_vec(mdf["X.2"]), c(1:nrow(mdf)))
 mdf <- drop_rowid(mdf)
 mdf <- mdf[names(mdf) != "X"]
-
+for(i in 1:nrow(mdf)) {
+  if(!is.na(mdf[i, "Rights"]) & str_detect(mdf[i, "Rights"], "No ")) {
+    mdf[i, "Rights"] <- "Unrestricted"
+  }else{
+    mdf[i, "Rights"] <- "Restricted"
+  }
+}
+for(i in 1:nrow(mdf)) {
+  if(mdf[i, "Rights"] == "Unrestricted") {
+    mdf[i, "Public.Access.Level"] <- "Public"
+  }else{
+    mdf[i, "Public.Access.Level"] <- "Private/Restricted"
+  }
+}
 ```
