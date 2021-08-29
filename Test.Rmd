@@ -1110,10 +1110,5 @@ re3data$Repository <- "re3data"
 uci$Repository <- "UCI Machine Learning Repository"
 zenodo$Repository <- "Zenodo"
 full_repository <- c(cdph$Repository, corgis$Repository, datahub$Repository, datahub$Repository, dryad$Repository, harvard$Repository, re3data$Repository, uci$Repository)
-objects <- mget(ls(), print)
-count <- 1
-for(i in objects) {
-  write.csv(objects[[i]], paste("./Data/", i, "_scraped"))
-}
 ```
 
