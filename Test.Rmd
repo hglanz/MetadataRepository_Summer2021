@@ -428,7 +428,7 @@ datahub
 
 ```{r}
 # Zenodo
-url <- j
+url <- "https://zenodo.org/record/5335900#.YS0kZtNKjt1"
 name <- scrape_rvest(url, "h1")
 author <- scrape_rvest(url, "h1 + p")
 cols <- c(c("Name", "Authors"), scrape_rvest(url, ".addthis_32x32_style+ h4 , dt:nth-child(14) , dt:nth-child(12) , dt:nth-child(5) , dt:nth-child(1) , #collapse-stats tr:nth-child(6) td:nth-child(1) , #collapse-stats tr:nth-child(5) td:nth-child(1)"))
@@ -481,7 +481,9 @@ if(!identical(citation, character(0))) {
   }
 }
 file_info <- unnest(file_info)
-df <- mutate(df, FileName = paste(file_info$Name, collapse = ", "), SizeMB = paste(file_info$SizeMB, collapse = ", "))
+#df <- dplyr::mutate(df, FileName = paste(file_info$Name, collapse = ", "), SizeMB = paste(file_info$SizeMB, collapse = ", "))
+df$FileName <- paste(file_info$Name, collapse = ", ")
+df$SizeMB <- paste(file_info$SizeMB, collapse = ", ")
 df <- df[, c("Name", "Authors", "Unique views", "Unique downloads", "Publication date:", "Keyword(s):", "Communities:", "FileName", "SizeMB")]
 
 #scrape_zenodo("https://zenodo.org/record/5081153#.YOZkbi1h23U")
@@ -500,7 +502,7 @@ for(i in 1:1) {
     print(nrow(full_df))
   }
 }
-scrape_zenodo(j)
+full_df
 ```
 
 ```{r}
