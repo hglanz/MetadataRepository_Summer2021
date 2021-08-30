@@ -428,7 +428,7 @@ datahub
 
 ```{r}
 # Zenodo
-url <- "https://zenodo.org/record/5045610#.YOZWXRNKgTV"
+url <- j
 name <- scrape_rvest(url, "h1")
 author <- scrape_rvest(url, "h1 + p")
 cols <- c(c("Name", "Authors"), scrape_rvest(url, ".addthis_32x32_style+ h4 , dt:nth-child(14) , dt:nth-child(12) , dt:nth-child(5) , dt:nth-child(1) , #collapse-stats tr:nth-child(6) td:nth-child(1) , #collapse-stats tr:nth-child(5) td:nth-child(1)"))
@@ -480,12 +480,11 @@ if(!identical(citation, character(0))) {
     df$`Cite as` <- c(NA)
   }
 }
-df <- mutate(df, FileInfo <- file_info)
 file_info <- unnest(file_info)
 df <- mutate(df, FileName = paste(file_info$Name, collapse = ", "), SizeMB = paste(file_info$SizeMB, collapse = ", "))
 df <- df[, c("Name", "Authors", "Unique views", "Unique downloads", "Publication date:", "Keyword(s):", "Communities:", "FileName", "SizeMB")]
 
-scrape_zenodo("https://zenodo.org/record/5081153#.YOZkbi1h23U")
+#scrape_zenodo("https://zenodo.org/record/5081153#.YOZkbi1h23U")
 ```
 
 ```{r}
@@ -493,15 +492,15 @@ full_df <- data.frame(matrix(ncol = 8, nrow = 0))
 for(i in 1:1) {
   url <- paste("https://zenodo.org/search?page=", i, "&size=20#", sep = "")
   url <- "https://zenodo.org"
-  pg <- read_html(url)
-  links <- html_attr(html_nodes(pg, "h4 a"), "href")
-  links <- links[str_detect(links, "/record/")]
-  links <- paste("https://zenodo.org", links, sep = "")
-  for(j in links) {
+  link <- Frost2021Package::links(url, "h4 a")
+  link <- link[str_detect(link, "/record/")]
+  link <- paste("https://zenodo.org", link, sep = "")
+  for(j in link) {
     full_df <- rbind(full_df, scrape_zenodo(j))
     print(nrow(full_df))
   }
 }
+scrape_zenodo(j)
 ```
 
 ```{r}
@@ -606,9 +605,9 @@ mdf <- merge_and_drop(mdf, "Authors", "Author")
 mdf <- merge_and_drop(mdf, "Name", "title")
 mdf <- merge_and_drop(mdf, "Publisher", "publisher")
 mdf <- merge_and_drop(mdf, "file_size", "X.Size.")
-mdf <- merge_and_drop(mdf, "file_size", "SizeMB")
+mdf <- merge_and_drop(mdf, "file_size", "sizeMB")
 mdf <- merge_and_drop(mdf, "Tags", "tags")
-mdf <- merge_and_drop(mdf, "Tags", "Keyword.s..")
+mdf <- merge_and_drop(mdf, "Tags", "Keyword.s.")
 mdf <- merge_and_drop(mdf, "Created", "X.Created.")
 mdf <- merge_and_drop(mdf, "Created", "date_created")
 mdf <- merge_and_drop(mdf, "Created", "Metadata.Created.Date")
@@ -649,6 +648,13 @@ for(i in 1:nrow(mdf)) {
   }
 }
 cat("\014")
+mdf$Downloads <- parse_number(mdf$Downloads)
+mdf$Last.Updated <- parse_date(mdf$Last.Updated)
+mdf$Created <- parse_date(mdf$Created)
+mdf$Last.Updated - mdf$Created
+mdf %>%
+  filter(str_length(file_size) != 1) %>%
+  select(file_size)
 ```
 
 ``` {r}
@@ -1109,6 +1115,17 @@ harvard$Repository <- "Harvard Dataverse"
 re3data$Repository <- "re3data"
 uci$Repository <- "UCI Machine Learning Repository"
 zenodo$Repository <- "Zenodo"
-full_repository <- c(cdph$Repository, corgis$Repository, datahub$Repository, datahub$Repository, dryad$Repository, harvard$Repository, re3data$Repository, uci$Repository)
+full_repository <- c(cdph$Repository, corgis$Repository, datahub$Repository, datashare$Repository, dryad$Repository, harvard$Repository, re3data$Repository, uci$Repository)
+mdf <- read.csv("./Data/mdf.csv")
+for(i in 1:(nrow(mdf)-length(full_repository))) {
+  full_repository <- append(full_repository, "Zenodo")
+}
+mdf$Repository <- full_repository
+mdf %>%
+  filter(!is.na(Name)) %>%
+  select(Name, Repository)
+
+mdf %>%
+  distinct(Name, .keep_all = TRUE)
 ```
 

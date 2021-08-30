@@ -10,3 +10,8 @@ for(i in l) {
   full_df <- rbind(full_df, scrape_datahub(i))
   cat("\014")
 }
+original <- read.csv("./Data/datahub_scraped.csv")
+full_df <- target(full_df, names(original))
+full_df <- rbind(full_df, original)
+full_df <- distinct(full_df, Name, .keep_all = TRUE)
+write.csv(full_df, "./Data/datahub_scraped.csv")

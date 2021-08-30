@@ -16,3 +16,7 @@ for(i in 1:109) {
     cat("\014")
   }
 }
+original <- read.csv("./Data/re3data_scraped.csv")
+full_df <- target(full_df, names(original))
+full_df <- rbind(full_df, original)
+write.csv(full_df, "./Data/re3data_scraped.csv")

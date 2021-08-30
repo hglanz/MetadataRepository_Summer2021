@@ -14,3 +14,5 @@ for(i in 1:11944) {
   }
 }
 full_df <- rbind(target(read.csv("./Data/harvard_actual_scraped.csv"), names(full_df)), full_df)
+full_df <- distinct(full_df, Name, .keep_all = TRUE)
+write.csv(full_df, "./Data/harvard_actual_scraped.csv")
