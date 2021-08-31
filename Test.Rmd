@@ -486,7 +486,7 @@ df$FileName <- paste(file_info$Name, collapse = ", ")
 df$SizeMB <- paste(file_info$SizeMB, collapse = ", ")
 df <- df[, c("Name", "Authors", "Unique views", "Unique downloads", "Publication date:", "Keyword(s):", "Communities:", "FileName", "SizeMB")]
 
-#scrape_zenodo("https://zenodo.org/record/5081153#.YOZkbi1h23U")
+scrape_zenodo("https://zenodo.org/record/5081153#.YOZkbi1h23U")
 ```
 
 ```{r}
@@ -507,7 +507,7 @@ full_df
 
 ```{r}
 url <- "https://figshare.com/articles/journal_contribution/The_Inhibitors_to_Information_Seeking_Behavior_of_Nursing_Students_in_General_English_and_ESP_Courses_from_University_Instructors_Perspective_A_Case_Study/14999532"
-name <- scrape_rvest(url, "._3lGK4")
+dname <- scrape_rvest(url, "._3lGK4")
 description <- scrape_rvest(url, "._1dO13")
 cols <- scrape_rvest(url, "._36trp , ._14z3R , ._1qu0d+ span")
 categories <- scrape_rvest(url, "li")
