@@ -321,19 +321,21 @@ df
 ```
 
 ```{r}
-full_df <- data.frame(matrix(ncol = ncol(test), nrow = 0))
-for(i in 1:119) {
+full_df <- data.frame(matrix(ncol = 12, nrow = 0))
+for(i in 1:117) {
   url <- paste("https://data.ca.gov/dataset?q=data&page=", i, sep = "")
   pg <- read_html(url)
-  links <- paste("https://data.ca.gov", html_attr(html_nodes(read_html(url), ".dataset-heading a"), "href"), sep = "") %>% data.frame() %>% distinct()
-  for(j in links$.) {
+  link <- paste("https://data.ca.gov", html_attr(html_nodes(read_html(url), ".dataset-heading a"), "href"), sep = "") %>% data.frame() %>% distinct()
+  for(j in link$.) {
     data_link <- j
+    print(nrow(full_df))
+    print(j)
     tryCatch(expr = {
       full_df <- rbind(full_df, scrape_cdph(data_link))
     }, error = function(err) {
       NULL
     })
-    print(nrow(full_df))
+    cat("\014")
   }
 }
 clean_tag <- str_split(full_df$Tags, "[ ]+") %>%
@@ -341,6 +343,8 @@ clean_tag <- str_split(full_df$Tags, "[ ]+") %>%
   data.frame()
 clean_tag <- str_remove_all(clean_tag$., c("c[{]", "[)]", "[\"]")) %>%
   data.frame()
+full_df
+cdph
 ```
 
 ```{r}
@@ -388,7 +392,7 @@ for(i in target) {
     }
   }
 df[target]
-#scrape_datagov("https://catalog.data.gov/dataset/department-for-the-aging-dfta-geriatric-mental-health-contracted-providers")
+scrape_datagov("https://catalog.data.gov/dataset/high-operational-temperature-mwir-detectors-with-optical-concentrators")
 ```
 
 ```{r}
@@ -1124,10 +1128,11 @@ for(i in 1:(nrow(mdf)-length(full_repository))) {
 }
 mdf$Repository <- full_repository
 mdf %>%
-  filter(!is.na(Name)) %>%
-  select(Name, Repository)
+  group_by(Name) %>%
+  summarise(count = n()) %>%
+  filter(count != 1)
 
-mdf %>%
-  distinct(Name, .keep_all = TRUE)
+scrape_cdph("https://data.ca.gov/dataset/west-nile-virus-cases-2006-present")
+mdf2 <- read.csv("./Data/mdf.csv")
 ```
 
